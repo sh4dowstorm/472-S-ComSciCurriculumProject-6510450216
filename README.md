@@ -7,3 +7,11 @@ This project is about checking the criteria of students to confirm graduation. T
 2. academic debt payment forms 
 3. graduation applications
 4. activity sheets (optional).
+
+# How to activate backend
+
+1. `python -m venv .venv`
+2. __activate virtual environment__ -> `source .venv/Scripts/activate`
+3. `pip install -r requirement.txt`
+4. __run server__ -> `python backend/cs_curriculum/manage.py runserver`
+5. __deactivate virtual environment__ -> `deactivate`
