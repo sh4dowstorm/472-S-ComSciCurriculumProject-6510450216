@@ -13,5 +13,6 @@ This project is about checking the criteria of students to confirm graduation. T
 1. `python -m venv .venv`
 2. __activate virtual environment__ -> `source .venv/Scripts/activate`
 3. `pip install -r requirement.txt`
-4. __run server__ -> `python backend/cs_curriculum/manage.py runserver`
-5. __deactivate virtual environment__ -> `deactivate`
+4. `python backend/cs_curriculum/manage.py migrate`
+5. __run server__ -> `python backend/cs_curriculum/manage.py runserver`
+6. __deactivate virtual environment__ -> `deactivate`
