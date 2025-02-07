@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from environ import Env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +27,9 @@ SECRET_KEY = 'django-insecure--v1kvu28t5pf866qx3x(y!d9#3t%b06+*%b(fu(gi+e&@36w!e
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+ENVIRON = Env()
+Env.read_env(BASE_DIR/'.env')
 
 
 # Application definition
@@ -83,8 +87,15 @@ WSGI_APPLICATION = 'cs_curriculum.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': ENVIRON('DB_NAME'),  
+        'USER': ENVIRON('DB_USER'),  
+        'PASSWORD': ENVIRON('DB_PASSWORD'),  
+        'HOST': ENVIRON('DB_HOST'),  
+        'PORT': ENVIRON('DB_PORT'),  
+        'OPTIONS': {  
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"  
+        },
     }
 }
 

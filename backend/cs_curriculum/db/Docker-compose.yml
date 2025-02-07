@@ -1,0 +1,14 @@
+services:
+  db:
+    container_name: cs_curriculum
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=cs_curriculum
+    ports:
+      - "3306:3306"
+    volumes:
+      - csc_db_data:/var/lib/mysql
+
+volumes:
+  csc_db_data:
