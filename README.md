@@ -28,8 +28,9 @@ To activate backend run the following command
 1. `python -m venv .venv`
 2. __activate virtual environment__ -> `source .venv/Scripts/activate`
 3. `pip install -r requirement.txt`
-4. `python backend/cs_curriculum/manage.py makemigrations`
-5. `python backend/cs_curriculum/manage.py migrate`
+4. `cp .env.example backend/cs_curriculum/.env`
+5. `python backend/cs_curriculum/manage.py makemigrations`
+6. `python backend/cs_curriculum/manage.py migrate`
 
 ### run server
 1. `python backend/cs_curriculum/manage.py runserver`
