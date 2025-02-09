@@ -9,6 +9,17 @@ services:
       - "3306:3306"
     volumes:
       - csc_db_data:/var/lib/mysql
+  phpmyadmin:
+    container_name: cs_curriculum_phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - MYSQL_ROOT_PASSWORD=1234
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
 
 volumes:
   csc_db_data:
