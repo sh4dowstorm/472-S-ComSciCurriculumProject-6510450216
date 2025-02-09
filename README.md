@@ -35,6 +35,12 @@ To activate backend run the following command
 ### run server
 1. `python backend/cs_curriculum/manage.py runserver`
 
+### access database via phpmyadmin
+1. Go to `http://127.0.0.1:8080/`
+    - username : root
+    - password : 1234
+
+
 ### deactivate backend program
 1. `docker compose down`
 2. `deactivate` in terminal using virtual environment
