@@ -10,3 +10,5 @@ class Curriculum(models.Model) :
     # curriculum_year example 2565
     curriculum_year = models.IntegerField()
     
+    def __str__(self):
+        return f'curriculum name: {self.curriculum_name}, {self.curriculum_year}, {self.total_credit}'

@@ -17,3 +17,6 @@ class User(models.Model) :
         choices=Role.choices
     )
     
+    def __str__(self):
+        return f'user {self.user_id}, {self.student_code}, {self.role}'
+    

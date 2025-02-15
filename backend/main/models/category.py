@@ -9,3 +9,6 @@ class Category(models.Model) :
     category_min_credit = models.IntegerField()
     
     curriculum_id = models.ForeignKey(Curriculum, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'course csategory: {self.category_name}'

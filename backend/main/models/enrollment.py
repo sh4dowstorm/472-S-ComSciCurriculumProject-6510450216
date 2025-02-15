@@ -17,3 +17,6 @@ class Enrollment(models.Model) :
     
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f'course id {self.course_id.course_id}, ({self.semester, self.year}), {self.grade}'
