@@ -1,4 +1,4 @@
-# ComSciCurriculumProject
+b# ComSciCurriculumProject
 
 ## This repository creates for senior project Integrated Agile Process and Devops_01418472-65.
 
@@ -42,3 +42,10 @@ To activate backend run the following command
 ### deactivate backend program
 1. `docker compose down`
 2. `deactivate` in terminal using virtual environment
+
+### how to do unit testing
+1. `cd backend`
+2. `pytest -sv`
+
+> `-s` flag is to show console printing </br>
+> `-v` flag is to show detail
