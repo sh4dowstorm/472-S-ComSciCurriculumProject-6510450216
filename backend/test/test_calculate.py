@@ -1,5 +1,6 @@
-from django.test import TestCase, RequestFactory
-
+from typing import List
+from django.test import TestCase
+from main.services import CalculatorService
 from main.models import Category, Curriculum, Subcategory, Course, Enrollment, User
 
 class CalculateTestCase(TestCase) :
@@ -70,24 +71,50 @@ class CalculateTestCase(TestCase) :
         )
         
         # setup student enrollment
-        self.st_enrollment = Enrollment.objects.create(
+        self.st_enrollment1 = Enrollment.objects.create(
             semester=Enrollment.Semester.FIRST,
             year=2565,
-            grade=3.50,
+            grade=0,
             user_id=self.u,
             course_id=self.c3,
         )
+        self.st_enrollment2 = Enrollment.objects.create(
+            semester=Enrollment.Semester.SECOND,
+            year=2565,
+            grade=3.5,
+            user_id=self.u,
+            course_id=self.c3,
+        )
+        self.st_enrollment3 = Enrollment.objects.create(
+            semester=Enrollment.Semester.FIRST,
+            year=2566,
+            grade=4,
+            user_id=self.u,
+            course_id=self.c3,
+        )
+        self.st_enrollment4 = Enrollment.objects.create(
+            semester=Enrollment.Semester.FIRST,
+            year=2565,
+            grade=4,
+            user_id=self.u,
+            course_id=self.c2,
+        )
         
-    def test_show(self) :
-        print(self.u)
-        print(self.cur1)
-        print(self.cate1)
-        print(self.cate2)
-        print(self.subcate1)
-        print(self.subcate2)
-        print(self.subcate3)
-        print(self.c1)
-        print(self.c2)
-        print(self.c3)
-        print(self.st_enrollment)
+    def test_calculate_nonduplicate_grade(self) :
+        calculatorService = CalculatorService()
+        
+        enrollments = [self.st_enrollment2, self.st_enrollment4]
+        calculatedEnrollments: List[Enrollment] = calculatorService.GPACalculate(enrollments)
+        
+        self.assertEqual(len(calculatedEnrollments), 2)
+        self.assertAlmostEqual(calculatedEnrollments[0].grade, 3.50)
+        self.assertAlmostEqual(calculatedEnrollments[1].grade, 4.00)
     
+    def test_calculate_duplicate_grade(self) :
+        calculatorService = CalculatorService()
+        
+        enrollments = [self.st_enrollment1, self.st_enrollment2, self.st_enrollment3]
+        calculatedEnrollments: List[Enrollment] = calculatorService.GPACalculate(enrollments)
+        
+        self.assertEqual(len(calculatedEnrollments), 1)
+        self.assertAlmostEqual(calculatedEnrollments[0].grade, 2.50)
