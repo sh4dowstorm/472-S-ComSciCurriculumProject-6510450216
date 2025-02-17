@@ -4,3 +4,7 @@ from .course import Course
 from .subcategory import Subcategory
 from .user import User
 from .enrollment import Enrollment
+from .credit_detail import CreditDetail
+from .form import Form
+from .subcategory_details import SubcategoryDetails
+from .verification_result import VerificationResult
