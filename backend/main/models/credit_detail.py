@@ -12,4 +12,4 @@ class CreditDetail(models.Model) :
     credit_details_id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     credit_status = models.IntegerField(choices=CreditStatus.choices, default=CreditStatus.INCOMPLETE)
     
-    verification_result_id = models.ForeignKey(VerificationResult, on_delete=models.CASCADE)
+    verification_result_fk = models.ForeignKey(VerificationResult, on_delete=models.CASCADE)

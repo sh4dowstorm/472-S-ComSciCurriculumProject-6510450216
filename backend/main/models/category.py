@@ -8,7 +8,7 @@ class Category(models.Model) :
     category_name = models.CharField(max_length=200)
     category_min_credit = models.IntegerField()
     
-    curriculum_id = models.ForeignKey(Curriculum, on_delete=models.CASCADE)
+    curriculum_fk = models.ForeignKey(Curriculum, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'course csategory: {self.category_name}'

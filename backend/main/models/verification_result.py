@@ -13,5 +13,5 @@ class VerificationResult(models.Model) :
     result_status = models.IntegerField(choices=VerificationResult.choices, default=VerificationResult.NOT_PASS)
     activity_status = models.IntegerField(choices=VerificationResult.choices, default=VerificationResult.NOT_PASS)
 
-    form_id = models.ForeignKey(Form, on_delete=models.CASCADE)
+    form_fk = models.ForeignKey(Form, on_delete=models.CASCADE)
     
