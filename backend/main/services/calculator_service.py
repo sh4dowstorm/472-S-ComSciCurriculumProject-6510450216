@@ -1,8 +1,8 @@
 from typing import Dict, List
 from ortools.linear_solver import pywraplp
 
-from ..models.subcategory import Subcategory
-from ..models import Enrollment
+from ..serializers import CreditVerifySerializer
+from ..models import Enrollment, Curriculum, Subcategory
 
 
 class CalculatorService() :
@@ -27,16 +27,33 @@ class CalculatorService() :
         
         for enrollment in stEnrollments :
             key = enrollment.course_fk.course_id
+            newGrade = enrollment.grade
             if calculatedEnrollments.get(key) :
                 # if duplicate course will add total grade
-                calculatedEnrollments[key].grade += enrollment.grade
+                oldGrade = calculatedEnrollments[key].grade if calculatedEnrollments[key].grade != None else 0
+                calculatedEnrollments[key].grade += enrollment.grade if newGrade != None else 0
+                
+                # DONE:  implement update recently year and semester
+                if enrollment.year > calculatedEnrollments[key].year :
+                    calculatedEnrollments[key].year = enrollment.year
+                    calculatedEnrollments[key].semester = enrollment.semester
+                elif enrollment.semester == Enrollment.Semester.SECOND :
+                    calculatedEnrollments[key].year = enrollment.year
+                    calculatedEnrollments[key].semester = enrollment.semester
+                elif enrollment.semester == Enrollment.Semester.FIRST :
+                    calculatedEnrollments[key].year = enrollment.year
+                    calculatedEnrollments[key].semester = enrollment.semester
+                else :
+                    raise RuntimeError("should not study the same subject in the same semester and year")
                 
             else :
                 # if first encounter add fresh data
                 calculatedEnrollments[key] = enrollment
                 encounter[key] = 0
-                
-            encounter[key] += 1
+            
+            if newGrade != None :
+                # increment if grade not None
+                encounter[key] += 1
             
         # averaging the gpa for every courses
         for key in list(calculatedEnrollments.keys()) :
@@ -134,7 +151,6 @@ class CalculatorService() :
             List[tuple[str, int]]|None: (course, decision) is telling that course will be choose to be in subcategory or None if problem not feasible
         """
         
-        print('\nSolver =', model)
         # linear programming solver
         solver: pywraplp.Solver = pywraplp.Solver.CreateSolver(model)
         
@@ -143,7 +159,8 @@ class CalculatorService() :
         
         # constraint
         constraint = sum([v*convertedEnrollment[v.name()]['credit'] for v in variables])
-        print('\nConstrain =', constraint)        
+        print('\n-----------------------')
+        print('Constraint:', constraint)
         
         solver.Add(constraint == minCredit)
         
@@ -154,13 +171,56 @@ class CalculatorService() :
         status = solver.Solve()
         
         if status == pywraplp.Solver.OPTIMAL :
-            print("\nSolution:")
-            print(f"Objective value = {solver.Objective().Value():0.1f}")
             for v in variables :
                 print(f"{v.name()} = {v.solution_value():0.1f}")
                 
             return [(v.name(), round(v.solution_value())) for v in variables]
                 
         else :
-            print('this problem does not have an optimal solution.')
+            print('problem not feasible')
             return None
+        
+    def verify(self, curriculum: Curriculum, enrollments: List[Enrollment], *args) :
+        # TODO: use only in testing
+        if not len(args) == 3 :
+            return None
+        categories, subcategories, courses = args
+        
+        cleanEnrollment = self.GPACalculate(enrollments)
+        mappingResult = self.map(subcategories, cleanEnrollment)
+        
+        studyResult = {
+            'curriculum': curriculum,
+            'categories': [
+                {
+                    'data':categories[0],
+                    'values':[
+                        {
+                            'data':e.course_fk,
+                            'result':e
+                        }
+                        for e in mappingResult['free elective']
+                    ],
+                    'isFreeElective': True,
+                },
+                {
+                    'data':categories[1],
+                    'values':[
+                        {
+                            'data': sub['subcategory'],
+                            'values': [
+                                {
+                                    'data': e.course_fk,
+                                    'result': e,
+                                }
+                                for e in sub['matchEnrollment'].values()
+                            ],
+                        }
+                        for sub in mappingResult['categorize course']
+                    ],
+                    'isFreeElective': False,
+                },
+            ]
+        }
+        
+        return CreditVerifySerializer(studyResult)

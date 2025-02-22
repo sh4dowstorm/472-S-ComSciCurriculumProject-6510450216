@@ -1,0 +1,25 @@
+from django.test import TestCase
+
+from main.utils.mock_data import *
+from main.services import CalculatorService
+
+class AssignResult(TestCase) :
+    def setUp(self) :
+        self.calculator = CalculatorService()
+        
+        self.student = mockUser()
+        
+        self.curriculum = mockCurriculum()
+        self.categories = mockCategories(self.curriculum)
+        
+        self.subcategories = mockSubcategories(self.categories[0], [('X', 4)])
+        
+        self.courses = mockCourses(self.subcategories[0], [3, 3, 1])
+        
+        enrollments = [(c, 4, 2565) for c in self.courses]
+        enrollments.append((self.courses[0], 0, 2566))
+        self.studiedCourse = mockEnrollments(self.student, enrollments)
+
+    def test_checking_result(self) :
+        result = self.calculator.verify(self.curriculum, self.studiedCourse, self.categories, self.subcategories, self.courses)
+        print(result.data)
