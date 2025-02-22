@@ -88,6 +88,8 @@ class CalculatorService() :
                 for courseId, selection in optimalAns :
                     if selection == 0 :
                         removedCourse = mappedEnrollment['matchEnrollment'].pop(courseId)
+                        mappedEnrollment['sumCredit'] -= removedCourse.course_fk.credit
+                        
                         result['free elective'].append(removedCourse)
 
             result['categorize course'].append(mappedEnrollment)
@@ -179,48 +181,3 @@ class CalculatorService() :
         else :
             print('problem not feasible')
             return None
-        
-    def verify(self, curriculum: Curriculum, enrollments: List[Enrollment], *args) :
-        # TODO: use only in testing
-        if not len(args) == 3 :
-            return None
-        categories, subcategories, courses = args
-        
-        cleanEnrollment = self.GPACalculate(enrollments)
-        mappingResult = self.map(subcategories, cleanEnrollment)
-        
-        studyResult = {
-            'curriculum': curriculum,
-            'categories': [
-                {
-                    'data':categories[0],
-                    'values':[
-                        {
-                            'data':e.course_fk,
-                            'result':e
-                        }
-                        for e in mappingResult['free elective']
-                    ],
-                    'isFreeElective': True,
-                },
-                {
-                    'data':categories[1],
-                    'values':[
-                        {
-                            'data': sub['subcategory'],
-                            'values': [
-                                {
-                                    'data': e.course_fk,
-                                    'result': e,
-                                }
-                                for e in sub['matchEnrollment'].values()
-                            ],
-                        }
-                        for sub in mappingResult['categorize course']
-                    ],
-                    'isFreeElective': False,
-                },
-            ]
-        }
-        
-        return CreditVerifySerializer(studyResult)

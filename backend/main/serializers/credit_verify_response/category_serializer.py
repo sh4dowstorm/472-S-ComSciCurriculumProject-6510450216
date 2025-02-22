@@ -10,26 +10,28 @@ class CategorySerializer(serializers.Serializer) :
     min_credit = serializers.IntegerField()
     subcategories = serializers.SerializerMethodField()
     courses = serializers.SerializerMethodField()
+    is_complete = serializers.BooleanField()
     
     def to_representation(self, instance):
-        if not (instance.get('data') and instance.get('values') and isinstance(instance.get('isFreeElective'), bool)) :
-            raise serializers.ValidationError('expected object with attribute name "data" and "values" and "isFreeElective" in CategorySerializer class')
-        if not isinstance(instance['data'], Category) :
+        if not (instance.get('category') and instance.get('courses_or_subcategories') and isinstance(instance.get('isFreeElective'), bool) and isinstance(instance.get('isComplete'), bool)) :
+            raise serializers.ValidationError('expected object with attribute name "category" and "courses_or_subcategories" and "isFreeElective" and "isComplete" in CategorySerializer class')
+        if not isinstance(instance['category'], Category) :
             raise serializers.ValidationError('unexpected object type in CategorySerializer class')
 
         if instance['isFreeElective'] :
             # incase of have no subcategory ex. หมวดวิชาเสรี
             return {
-                'category_name': instance['data'].category_name,
-                'min_credit': instance['data'].category_min_credit,
+                'category_name': instance['category'].category_name,
+                'min_credit': instance['category'].category_min_credit,
                 'subcategories': None,
-                'courses': self.get_courses(instance['values']),
+                'courses': self.get_courses(instance['courses_or_subcategories']),
+                'is_complete': instance['isComplete'],
             }
         
         return {
-            'category_name': instance['data'].category_name,
-            'min_credit': instance['data'].category_min_credit,
-            'subcategories': self.get_subcategories(instance['values']),
+            'category_name': instance['category'].category_name,
+            'min_credit': instance['category'].category_min_credit,
+            'subcategories': self.get_subcategories(instance['courses_or_subcategories']),
             'courses': None,
         }
         

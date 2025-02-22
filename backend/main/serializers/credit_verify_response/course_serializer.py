@@ -10,15 +10,15 @@ class CourseSerializer(serializers.Serializer) :
     results = serializers.SerializerMethodField()
     
     def to_representation(self, instance):
-        if not (instance.get('data') and instance.get('result')) :
-            raise serializers.ValidationError('expected object with attribute name "data" and "result" in CourseSerializer class')
-        if not isinstance(instance['data'], Course) :
+        if not (instance.get('course') and instance.get('studyResult')) :
+            raise serializers.ValidationError('expected object with attribute name "course" and "studyResult" in CourseSerializer class')
+        if not isinstance(instance['course'], Course) :
             raise serializers.ValidationError('unexpected object type in CourseSerializer class')
             
         return {
-            'subcategory_name': instance['data'].course_id,
-            'credit': instance['data'].credit,
-            'result': self.get_results(instance['result']),
+            'subcategory_name': instance['course'].course_id,
+            'credit': instance['course'].credit,
+            'results': self.get_results(instance['studyResult']),
         }
         
     def get_results(self, studyResultSerialized) :
