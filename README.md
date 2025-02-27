@@ -1,4 +1,4 @@
-b# ComSciCurriculumProject
+# ComSciCurriculumProject
 
 ## This repository creates for senior project Integrated Agile Process and Devops_01418472-65.
 
@@ -7,6 +7,13 @@ This project is about checking the criteria of students to confirm graduation. T
 2. academic debt payment forms 
 3. graduation applications
 4. activity sheets (optional).
+
+# How to activate frontend
+To activate frontend run the following command
+> suggest using git bash
+1. `cd frontend/`
+2. `npm install`
+3. `npm run dev`
 
 # How to activate backend
 
