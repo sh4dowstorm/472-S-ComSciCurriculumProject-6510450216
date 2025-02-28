@@ -19,11 +19,17 @@ const CreditCheckPage: React.FC = () => {
     setFile(selectedFile || null);
   };
 
+  const handleRemoveFile = () => {
+    setFile(null);
+  };
+
   const handleSubmit = () => {
     if (!file) {
       setMessage("ไม่สามารถตรวจสอบไฟล์ได้");
       setMessageType("error");
-    } else if (file && file.type !== "application/pdf") {
+      return;
+    }
+    if (file.type !== "application/pdf") {
       setMessage("ไฟล์แนบต้องเป็น PDF");
       setMessageType("error");
     } else {
@@ -78,20 +84,20 @@ const CreditCheckPage: React.FC = () => {
             </label>
           </div>
           <div className="upload-section">
-            <span className="upload-text">Upload Your transcript*</span>
-            <UploadFileButton onChange={handleFileChange} />
+            <span className="upload-text">Upload Your Transcript*</span>
+            <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
           <p />
           <div className="upload-container faded">
             <span className="upload-text">
               Upload Your Activity Transcript*
             </span>
-            <UploadFileButton onChange={handleFileChange} />
+            <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
           <p />
           <div className="upload-container faded">
             <span className="upload-text">Upload Your Receipt*</span>
-            <UploadFileButton onChange={handleFileChange} />
+            <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
           {message && (
             <div className="message-container">
