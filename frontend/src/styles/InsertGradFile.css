@@ -39,10 +39,14 @@
 .upload-container {
   display: flex;
   align-items: center;
-  gap: 0.4em; /* Space between text and input */
-  width: 33%; /* Ensure the container takes full width */
+  margin-bottom: 0.3em;
 }
 
+.upload-text {
+  margin-right: 12px;
+  font-size: 16px;
+  color: white;
+}
 .upload-container span {
   flex-shrink: 0; /* Prevent the text from shrinking */
   width: 250px; /* Set a fixed width for alignment */

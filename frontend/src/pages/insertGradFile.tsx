@@ -2,38 +2,29 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import "../styles/InsertGradFile.css";
+import UploadFileButton from "../components/uploadfile-button";
 
 const InsertGradFile: React.FC = () => {
-  const [files, setFiles] = useState<{ [key: string]: File | null }>({
-    transcript: null,
-    activityTranscript: null,
-    receipt: null,
-  });
+  const [file, setFile] = useState<File | null>(null);
   const [selectedPage, setSelectedPage] = useState("insertgradfile");
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"error" | "success" | null>(null);
   const navigate = useNavigate();
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, fileType: string) => {
-    if (event.target.files) {
-      const selectedFile = event.target.files[0];
-      setFiles((prevFiles) => ({ ...prevFiles, [fileType]: selectedFile }));
-    }
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    setFile(selectedFile || null);
   };
 
   const handleSubmit = () => {
-    const invalidFiles = Object.values(files).filter(
-      (file) => file && file.type !== "application/pdf"
-    );
-
-    if (invalidFiles.length > 0) {
+    if (file && file.type !== "application/pdf") {
       setMessage("Only PDF files are allowed.");
       setMessageType("error");
     } else {
       setMessage("Files are valid.");
       setMessageType("success");
       // Logic to send files to the backend
-      console.log("Files sent to backend:", files);
+      console.log("Files sent to backend:", file);
     }
   };
 
@@ -80,17 +71,20 @@ const InsertGradFile: React.FC = () => {
               Credit Check
             </label>
           </div>
+          <p />
           <div className="upload-container">
-            <span>Upload Your Transcript*</span>
-            <input type="file" onChange={(e) => handleFileChange(e, "transcript")} />
+            <span className="upload-text"> Upload Your Transcript*</span>
+            <UploadFileButton onChange={handleFileChange} />
           </div>
+          <p />
           <div className="upload-container">
-            <span>Upload Your Activity Transcript*</span>
-            <input type="file" onChange={(e) => handleFileChange(e, "activityTranscript")} />
+            <span className="upload-text">Upload Your Activity Transcript*</span>
+            <UploadFileButton onChange={handleFileChange} />
           </div>
+          <p />
           <div className="upload-container">
-            <span>Upload Your Receipt*</span>
-            <input type="file" onChange={(e) => handleFileChange(e, "receipt")} />
+            <span className="upload-text">Upload Your Receipt*</span>
+            <UploadFileButton onChange={handleFileChange} />
           </div>
           {message && (
             <div className="message-container">
