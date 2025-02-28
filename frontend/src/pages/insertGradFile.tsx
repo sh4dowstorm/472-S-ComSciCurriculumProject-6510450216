@@ -10,6 +10,8 @@ const InsertGradFile: React.FC = () => {
   const [selectedPage, setSelectedPage] = useState("insertgradfile");
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"error" | "success" | null>(null);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [navigateTo, setNavigateTo] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,8 +46,26 @@ const InsertGradFile: React.FC = () => {
   }, [message]);
 
   const handleNavigate = (page: string) => {
-    setSelectedPage(page);
-    navigate(`/${page}`);
+    if (file) {
+      setShowConfirmPopup(true);
+      setNavigateTo(page);
+    } else {
+      setSelectedPage(page);
+      navigate(`/${page}`);
+    }
+  };
+
+  const confirmNavigation = () => {
+    if (navigateTo) {
+      setSelectedPage(navigateTo);
+      navigate(`/${navigateTo}`);
+    }
+    setShowConfirmPopup(false);
+  };
+
+  const cancelNavigation = () => {
+    setShowConfirmPopup(false);
+    setNavigateTo(null);
   };
 
   return (
@@ -99,6 +119,13 @@ const InsertGradFile: React.FC = () => {
           <Button text="ตรวจสอบไฟล์" className="button" onClick={handleSubmit} />
         </div>
       </div>
+      {showConfirmPopup && (
+        <div className="confirm-popup">
+          <p>Are you sure you want to navigate to Credit Check? Unsaved changes will be lost.</p>
+          <button onClick={confirmNavigation}>Confirm</button>
+          <button onClick={cancelNavigation}>Cancel</button>
+        </div>
+      )}
     </div>
   );
 };
