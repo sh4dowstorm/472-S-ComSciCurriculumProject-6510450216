@@ -4,6 +4,7 @@ import Header from "../components/header";
 import Button from "../components/button";
 import UploadFileButton from "../components/uploadfile-button";
 import "../styles/insertGradFile.css";
+import { IoWarningOutline} from "react-icons/io5";
 
 const InsertGradFile: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -121,9 +122,10 @@ const InsertGradFile: React.FC = () => {
       </div>
       {showConfirmPopup && (
         <div className="confirm-popup">
-          <p>Are you sure you want to navigate to Credit Check? Unsaved changes will be lost.</p>
-          <button onClick={confirmNavigation}>Confirm</button>
-          <button onClick={cancelNavigation}>Cancel</button>
+          <IoWarningOutline className="warning-icon" />
+          <p>หากเปลี่ยนเป็นฟอร์ม ไฟล์ที่แนบไว้จะหายไป คุณต้องการดำเนินการต่อหรือไม่?</p>
+          <Button text="ยืนยัน" className="confirm-button" onClick={confirmNavigation}/>
+          <Button text="ยกเลิก" className="cancel-button" onClick={cancelNavigation}/>
         </div>
       )}
     </div>
