@@ -78,3 +78,8 @@
   flex-direction: row;
   gap: 3em;
 }
+
+.faded {
+  opacity: 0.3;
+  pointer-events: none; /* Make it non-clickable */
+}

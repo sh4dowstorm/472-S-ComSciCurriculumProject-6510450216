@@ -8,7 +8,9 @@ import "../styles/creditCheck.css";
 const CreditCheckPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [messageType, setMessageType] = useState<"error" | "success" | null>(null);
+  const [messageType, setMessageType] = useState<"error" | "success" | null>(
+    null
+  );
   const [selectedPage, setSelectedPage] = useState("creditcheck");
   const navigate = useNavigate();
 
@@ -74,6 +76,18 @@ const CreditCheckPage: React.FC = () => {
           </div>
           <div className="upload-section">
             <span className="upload-text">Upload your transcript*</span>
+            <UploadFileButton onChange={handleFileChange} />
+          </div>
+          <p />
+          <div className="upload-container faded">
+            <span className="upload-text">
+              Upload Your Activity Transcript*
+            </span>
+            <UploadFileButton onChange={handleFileChange} />
+          </div>
+          <p />
+          <div className="upload-container faded">
+            <span className="upload-text">Upload Your Receipt*</span>
             <UploadFileButton onChange={handleFileChange} />
           </div>
           {message && (
