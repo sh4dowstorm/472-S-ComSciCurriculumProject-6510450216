@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/header";
 import Button from "../components/button";
 import UploadFileButton from "../components/uploadfile-button";
@@ -6,22 +6,37 @@ import "../styles/creditCheck.css";
 
 const CreditCheckPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [messageType, setMessageType] = useState<"error" | "success" | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     setFile(selectedFile || null);
-    setError(null);
+    
   };
 
   const handleSubmit = () => {
     if (file && file.type !== "application/pdf") {
-      setError("Only PDF files are allowed.");
-      return;
+      setMessage("Only PDF files are allowed.");
+      setMessageType("error");
+    } else {
+      setMessage("Files are valid.");
+      setMessageType("success");
+      // Logic to send files to the backend
+      console.log("Files sent to backend:", file);
     }
-    // Logic to send data to the backend
-    console.log("Data sent to backend");
   };
+
+  useEffect(() => {
+      if (message) {
+        const timer = setTimeout(() => {
+          setMessage(null);
+          setMessageType(null);
+        }, 3000); // 3 seconds
+  
+        return () => clearTimeout(timer);
+      }
+    }, [message]);
 
   return (
     <div className="credit-check-page">
@@ -33,7 +48,11 @@ const CreditCheckPage: React.FC = () => {
             <span className="upload-text">Upload your transcript*</span>
             <UploadFileButton onChange={handleFileChange} />
           </div>
-          {error && <div className="error-popup">{error}</div>}
+          {message && (
+            <div className="message-container">
+              <p className={messageType === "success" ? "success-message" : "error-message"}>{message}</p>
+            </div>
+          )}
           <p />
           <Button text="Submit" className="button" onClick={handleSubmit} />
         </div>

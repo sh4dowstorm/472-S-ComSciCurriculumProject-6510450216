@@ -33,7 +33,33 @@
   color: white;
 }
 
-.error-popup {
-  color: red;
+.message-container {
+  padding: 1em;
+  width: 100%;
+  border-radius: 0px;
   margin-top: 1em;
+  text-align: center;
+  color: white;
+  position: fixed; /* Make it a popup */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000; /* Ensure it is above other elements */
+  background-color: rgba(255, 255, 255, 0); /* Adjust transparency */
+}
+
+.error-message {
+  background-color: #e10505b8;
+  color: white;
+  font-size: 3.5em;
+  margin-top: 1em;
+  text-align: center;
+}
+
+.success-message {
+  background-color: #00ca39b8;
+  color: white;
+  font-size: 3.5em;
+  margin-top: 1em;
+  text-align: center;
 }
