@@ -20,6 +20,10 @@ const InsertGradFile: React.FC = () => {
     setFile(selectedFile || null);
   };
 
+  const handleRemoveFile = () => {
+    setFile(null);
+  }
+
   const handleSubmit = () => {
     if (!file) {
       setMessage("ไม่สามารถตรวจสอบไฟล์ได้");
@@ -99,17 +103,17 @@ const InsertGradFile: React.FC = () => {
           <p />
           <div className="upload-container">
             <span className="upload-text"> Upload Your Transcript*</span>
-            <UploadFileButton onChange={handleFileChange} />
+            <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
           <p />
           <div className="upload-container">
             <span className="upload-text">Upload Your Activity Transcript*</span>
-            <UploadFileButton onChange={handleFileChange} />
+            <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
           <p />
           <div className="upload-container">
             <span className="upload-text">Upload Your Receipt*</span>
-            <UploadFileButton onChange={handleFileChange} />
+            <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
           {message && (
             <div className="message-container">

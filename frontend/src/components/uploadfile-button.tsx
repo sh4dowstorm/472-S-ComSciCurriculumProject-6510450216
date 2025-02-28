@@ -5,18 +5,24 @@ import { IoCloudUploadOutline, IoCloseCircleOutline } from "react-icons/io5";
 interface UploadFileButtonProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   buttonText?: string;
+  onRemoveFile?: () => void;
 }
 
 const UploadFileButton: React.FC<UploadFileButtonProps> = ({
   onChange,
   buttonText = "Upload File",
+  onRemoveFile,
 }) => {
   const [fileName, setFileName] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setFileName(file.name);
+      const truncatedName =
+        file.name.length > 15
+          ? `${file.name.substring(0, 12)}...${file.name.split(".").pop()}`
+          : file.name;
+      setFileName(truncatedName);
       if (onChange) {
         onChange(event);
       }
@@ -25,6 +31,9 @@ const UploadFileButton: React.FC<UploadFileButtonProps> = ({
 
   const handleRemoveFile = () => {
     setFileName(null);
+    if (onRemoveFile) {
+      onRemoveFile();
+    }
   };
 
   return (
