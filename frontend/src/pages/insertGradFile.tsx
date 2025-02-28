@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
-import "../styles/InsertGradFile.css";
+import Button from "../components/button";
 import UploadFileButton from "../components/uploadfile-button";
+import "../styles/insertGradFile.css";
 
 const InsertGradFile: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -91,7 +92,8 @@ const InsertGradFile: React.FC = () => {
               <p className={messageType === "success" ? "success-message" : "error-message"}>{message}</p>
             </div>
           )}
-          <button className="button" onClick={handleSubmit}>Inspect Files</button>
+          <p />
+          <Button text="Submit" className="button" onClick={handleSubmit} />
         </div>
       </div>
     </div>
