@@ -16,7 +16,11 @@ const UploadFileButton: React.FC<UploadFileButtonProps> = ({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setFileName(file.name);
+      const truncatedName =
+        file.name.length > 15
+          ? `${file.name.substring(0, 12)}...${file.name.split(".").pop()}`
+          : file.name;
+      setFileName(truncatedName);
       if (onChange) {
         onChange(event);
       }
