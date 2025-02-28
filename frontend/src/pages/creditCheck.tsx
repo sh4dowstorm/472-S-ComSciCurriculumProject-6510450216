@@ -20,7 +20,10 @@ const CreditCheckPage: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    if (file && file.type !== "application/pdf") {
+    if (!file) {
+      return;
+    }
+    if (file.type !== "application/pdf") {
       setMessage("Only PDF files are allowed.");
       setMessageType("error");
     } else {
@@ -92,7 +95,15 @@ const CreditCheckPage: React.FC = () => {
           </div>
           {message && (
             <div className="message-container">
-              <p className={messageType === "success" ? "success-message" : "error-message"}>{message}</p>
+              <p
+                className={
+                  messageType === "success"
+                    ? "success-message"
+                    : "error-message"
+                }
+              >
+                {message}
+              </p>
             </div>
           )}
           <p />
