@@ -20,3 +20,20 @@
   font-weight: 500;
   margin-bottom: 1em;
 }
+
+.upload-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.upload-text {
+  margin-right: 12px;
+  font-size: 16px;
+  color: white;
+}
+
+.error-popup {
+  color: red;
+  margin-top: 1em;
+}

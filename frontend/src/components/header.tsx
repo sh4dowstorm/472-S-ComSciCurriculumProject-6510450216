@@ -6,7 +6,7 @@ const Header: React.FC = () => {
     <header className="header">
       <div className="logo-container">
         <img
-          src="./public/KU_Logo_JPG.jpg"
+          src="./KU_Logo_JPG.jpg"
           alt="Logo"
           className="logo"
         />

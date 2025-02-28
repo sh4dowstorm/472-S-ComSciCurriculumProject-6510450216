@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/Home";
+import HomePage from "./pages/home";
 import CreditCheckPage from "./pages/creditCheck";
 
 const App: React.FC = () => {
