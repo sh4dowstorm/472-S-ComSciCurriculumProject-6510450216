@@ -1,25 +1,26 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
+import Button from "../components/button";
+import UploadFileButton from "../components/uploadfile-button";
 import "../styles/creditCheck.css";
 
 const CreditCheckPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setFile(event.target.files[0]);
-    }
+    const selectedFile = event.target.files?.[0];
+    setFile(selectedFile || null);
+    setError(null);
   };
 
   const handleSubmit = () => {
-    if (file) {
-      // Logic to send file to the backend
-      console.log("File sent to backend:", file.name);
-    } else {
-      console.log("No file selected");
+    if (file && file.type !== "application/pdf") {
+      setError("Only PDF files are allowed.");
+      return;
     }
+    // Logic to send data to the backend
+    console.log("Data sent to backend");
   };
 
   return (
@@ -27,8 +28,14 @@ const CreditCheckPage: React.FC = () => {
       <Header />
       <div className="content">
         <div className="credit-check-container">
-          <input type="file" onChange={handleFileChange} />
-          <button className="button" onClick={handleSubmit}>Submit</button>
+          <h1>Credit Check</h1>
+          <div className="upload-section">
+            <span className="upload-text">Upload your transcript*</span>
+            <UploadFileButton onChange={handleFileChange} />
+          </div>
+          {error && <div className="error-popup">{error}</div>}
+          <p />
+          <Button text="Submit" className="button" onClick={handleSubmit} />
         </div>
       </div>
     </div>

@@ -21,10 +21,19 @@
   margin-bottom: 1em;
 }
 
-.button-container {
-  position: absolute; /* Change to relative positioning */
-  top: 1em; /* Adjust this value to position the buttons inside the container */
+.upload-section {
   display: flex;
-  flex-direction: row;
-  gap: 2em;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.upload-text {
+  margin-right: 12px;
+  font-size: 16px;
+  color: white;
+}
+
+.error-popup {
+  color: red;
+  margin-top: 1em;
 }

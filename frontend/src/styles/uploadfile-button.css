@@ -1,0 +1,40 @@
+.upload-file-button {
+  display: flex;
+  align-items: center;
+}
+
+.upload-text {
+  margin-right: 12px;
+  font-size: 16px;
+  color: black;
+}
+
+.uploadfile-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  background-color: gainsboro;
+  color: black;
+  border: 1px dashed #d9d9d9;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.uploadfile-button input[type="file"] {
+  display: none;
+}
+
+.upload-icon {
+  margin-right: 10px;
+  font-size: 24px; /* icon size */
+}
+
+.delete-icon {
+  margin-left: 12px;
+  cursor: pointer;
+  color: red;
+  font-size: 36px; /* icon size */
+}
