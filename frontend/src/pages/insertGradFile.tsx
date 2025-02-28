@@ -18,11 +18,14 @@ const InsertGradFile: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    if (file && file.type !== "application/pdf") {
-      setMessage("Only PDF files are allowed.");
+    if (!file) {
+      setMessage("ไม่สามารถตรวจสอบไฟล์ได้");
+      setMessageType("error");
+    } else if (file && file.type !== "application/pdf") {
+      setMessage("ไฟล์แนบต้องเป็น PDF");
       setMessageType("error");
     } else {
-      setMessage("Files are valid.");
+      setMessage("ไฟล์ถูกต้อง");
       setMessageType("success");
       // Logic to send files to the backend
       console.log("Files sent to backend:", file);
@@ -93,7 +96,7 @@ const InsertGradFile: React.FC = () => {
             </div>
           )}
           <p />
-          <Button text="Submit" className="button" onClick={handleSubmit} />
+          <Button text="ตรวจสอบไฟล์" className="button" onClick={handleSubmit} />
         </div>
       </div>
     </div>
