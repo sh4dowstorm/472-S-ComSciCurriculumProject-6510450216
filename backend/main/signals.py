@@ -51,14 +51,14 @@ def import_curriculum_from_json(json_file_path):
             if content['heading'] == "โครงสร้างหลักสูตร :":
                 for structure in content['structure']:
                     category = Category.objects.create(
-                        curriculum_id_id=curriculum.curriculum_id,
+                        curriculum_fk=curriculum,
                         category_name=clean_title(structure['title']),
                         category_min_credit=extract_number(structure['description'])
                     )
                     
                     for subsection in structure.get('subsections', []):
                         Subcategory.objects.create(
-                            category_id_id=category.category_id,
+                            category_fk=category,
                             subcategory_name=map_long_subtitle(clean_title(subsection['subtitle'])),
                             subcateory_min_credit=extract_number(subsection['details'])
                         )
