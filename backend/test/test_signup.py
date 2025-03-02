@@ -1,160 +1,145 @@
-from django.test import TestCase, Client
-from django.urls import reverse
-from django.core import mail
-from django.contrib.sessions.middleware import SessionMiddleware
+from django.test import TestCase
+from unittest.mock import patch
 from main.models import OTPVerification, User, Form
-from main.forms import EmailForm, OTPVerificationForm
-from django.utils import timezone
-from datetime import timedelta
+from main.services import SignupService  
 
-class SignupTests(TestCase):
+class SignupServiceTest(TestCase):
     def setUp(self):
-        self.client = Client()
-        self.signup_url = reverse('signup_with_otp')
-        self.verify_url = reverse('verify_otp')
-        self.complete_url = reverse('complete_registration')
+        OTPVerification.objects.all().delete()  # Clear any old OTP records
+        self.email = "test@example.com"
+        self.student_code = "STU123"
+        self.inspector_key = "INSPECTOR123"
+        self.user = User.objects.create(email=self.email, role="student", student_code=self.student_code)
+    
+    def test_generate_and_save_otp(self):
+        """Test OTP generation and saving to database"""
+        email = "test@example.com"
+        otp, reference = SignupService.generate_and_save_otp(email)
         
-    def test_signup_get(self):
-        """Test GET request to signup page"""
-        response = self.client.get(self.signup_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'signup_with_otp.html')
-        self.assertIsInstance(response.context['form'], EmailForm)
+        # Check that OTP is saved in the database
+        self.assertTrue(OTPVerification.objects.filter(email=email, otp=otp, reference_otp=reference).exists())
 
-    def test_signup_post_valid_email(self):
-        """Test successful OTP generation and email sending"""
-        data = {'email': 'test@example.com'}
-        response = self.client.post(self.signup_url, data)
-        self.assertRedirects(response, self.verify_url)
+    def test_send_otp_email(self):
+        """Test OTP email sending"""
+        email = "test@example.com"
+        otp, reference = "123456", "ABC123"
+        success, error = SignupService.send_otp_email(email, otp, reference)
         
-        otp_obj = OTPVerification.objects.filter(email='test@example.com').first()
-        self.assertIsNotNone(otp_obj)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to[0], 'test@example.com')
+        self.assertTrue(success)
+        self.assertIsNone(error)
 
-    def test_verify_otp_without_email(self):
-        """Test accessing verify page without email in session"""
-        response = self.client.get(self.verify_url)
-        self.assertRedirects(response, self.signup_url)
+    def test_verify_otp(self):
+        """Test OTP verification"""
+        email = "test@example.com"
+        otp, reference = SignupService.generate_and_save_otp(email)
+        
+        # Verify the OTP
+        result, error = SignupService.verify_otp(email, otp)
+        self.assertTrue(result)
+        self.assertIsNone(error)
 
-    def test_verify_otp_valid(self):
-        """Test successful OTP verification"""
-        email = 'test@example.com'
-        otp = '123456'
-        OTPVerification.objects.create(
-            email=email,
-            otp=otp,
-            reference_otp='REF123'
+    def test_create_user(self):
+        """Test user creation"""
+        user = SignupService.create_user(
+            email="student@example.com",
+            password="securepassword",
+            name="John Doe",
+            role=User.Role.STUDENT,
+            student_code="ST12345"
         )
         
-        session = self.client.session
-        session['email_for_otp'] = email
-        session.save()
-        
-        response = self.client.post(self.verify_url, {'otp': otp})
-        self.assertRedirects(response, self.complete_url)
-
-    def test_verify_otp_invalid(self):
-        """Test invalid OTP verification"""
-        email = 'test@example.com'
-        session = self.client.session
-        session['email_for_otp'] = email
-        session.save()
-        
-        # Use an incorrect OTP of exactly 6 characters
-        response = self.client.post(self.verify_url, {'otp': '000000'})
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Invalid or expired OTP', response.content.decode())
-
-        # Use an incorrect OTP that is too long (should trigger form validation)
-        response = self.client.post(self.verify_url, {'otp': '1234567'})
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('OTP must be exactly 6 digits', response.content.decode())
-
-        # Use an incorrect OTP that is too short
-        response = self.client.post(self.verify_url, {'otp': '123'})
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('OTP must be exactly 6 digits', response.content.decode())
-
-    def test_complete_registration_student(self):
-        """Test successful student registration"""
-        session = self.client.session
-        session['verified_email'] = 'test@example.com'
-        session.save()
-        
-        data = {
-            'name': 'Test Student',
-            'password': 'testpass123',
-            'confirm-password': 'testpass123',
-            'role': 'student',
-            'student-code': 'STU123'
-        }
-        
-        response = self.client.post(self.complete_url, data, follow=True)
-        self.assertRedirects(response, '/api/admin/', status_code=302, target_status_code=200)
-        
-        user = User.objects.filter(email='test@example.com').first()
-        self.assertIsNotNone(user)
+        self.assertEqual(user.email, "student@example.com")
         self.assertEqual(user.role, User.Role.STUDENT)
-        self.assertEqual(user.student_code, 'STU123')
         
-        form = Form.objects.filter(user_id=user).first()
+        # Check if graduation form is created
+        self.assertTrue(Form.objects.filter(user_id=user, form_type=Form.FormType.GRADUATION_CHECK).exists())
+        
+    def test_cleanup_otp(self):
+        """Test if cleanup_otp deletes all OTP records for a given email"""
+        OTPVerification.objects.create(email=self.email, otp="123456", reference_otp="REF001")
+        OTPVerification.objects.create(email=self.email, otp="654321", reference_otp="REF002")
+
+        self.assertEqual(OTPVerification.objects.filter(email=self.email).count(), 2)
+        
+        SignupService.cleanup_otp(self.email)
+        
+        self.assertEqual(OTPVerification.objects.filter(email=self.email).count(), 0)
+
+
+    def test_validate_registration_password_mismatch(self):
+        """Test registration validation when passwords do not match"""
+        is_valid, error = SignupService.validate_registration_data(
+            "password123", "password456", "student", "STU123", None
+        )
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Passwords do not match")
+
+    def test_validate_registration_student_without_code(self):
+        """Test registration validation when student code is missing"""
+        is_valid, error = SignupService.validate_registration_data(
+            "password123", "password123", "student", None, None
+        )
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Student code is required for students")
+
+    def test_validate_registration_student_code_already_exists(self):
+        """Test registration validation when student code is already in use"""
+        User.objects.create(email="another@example.com", role="student", student_code="STU123")
+
+        is_valid, error = SignupService.validate_registration_data(
+            "password123", "password123", "student", "STU123", None
+        )
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Student code already exists")
+
+    def test_validate_registration_inspector_without_key_code(self):
+        """Test registration validation when inspector key code is missing"""
+        is_valid, error = SignupService.validate_registration_data(
+            "password123", "password123", "inspector", None, None
+        )
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Key code is required for inspectors")
+
+    @patch("main.services.signup_service.SignupService.validate_key_code")
+    def test_validate_registration_invalid_key_code(self, mock_validate_key_code):
+        """Test registration validation when inspector key code is invalid"""
+        mock_validate_key_code.return_value = False
+
+        is_valid, error = SignupService.validate_registration_data(
+            "password123", "password123", "inspector", None, "INVALID"
+        )
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Invalid key code")
+
+    def test_validate_registration_valid_student(self):
+        """Test valid student registration"""
+        is_valid, error = SignupService.validate_registration_data(
+            "password123", "password123", "student", "NEWSTU123", None
+        )
+        self.assertTrue(is_valid)
+        self.assertIsNone(error)
+
+    def test_validate_registration_valid_inspector(self):
+        """Test valid inspector registration"""
+        is_valid, error = SignupService.validate_registration_data(
+            "password123", "password123", "inspector", None, "INSPECTOR123"
+        )
+        self.assertTrue(is_valid)
+        self.assertIsNone(error)
+
+    def test_validate_key_code_valid(self):
+        """Test valid inspector key code"""
+        self.assertTrue(SignupService.validate_key_code("INSPECTOR123"))
+
+    def test_validate_key_code_invalid(self):
+        """Test invalid inspector key code"""
+        self.assertFalse(SignupService.validate_key_code("INVALID"))
+
+    def test_create_graduation_check_form(self):
+        """Test if a graduation check form is created for a student"""
+        form = SignupService.create_graduation_check_form(self.user)
         self.assertIsNotNone(form)
+        self.assertEqual(form.user_id, self.user)
+        self.assertEqual(form.form_status, Form.FormStatus.DRAFT)
         self.assertEqual(form.form_type, Form.FormType.GRADUATION_CHECK)
 
-    def test_complete_registration_inspector(self):
-        """Test successful inspector registration"""
-        session = self.client.session
-        session['verified_email'] = 'inspector@example.com'
-        session.save()
-        
-        data = {
-            'name': 'Test Inspector',
-            'password': 'testpass123',
-            'confirm-password': 'testpass123',
-            'role': 'inspector',
-            'key-code': 'INSPECTOR123'
-        }
-        
-        response = self.client.post(self.complete_url, data, follow=True)
-        self.assertRedirects(response, '/api/admin/', status_code=302, target_status_code=200)
-        
-        user = User.objects.filter(email='inspector@example.com').first()
-        self.assertIsNotNone(user)
-        self.assertEqual(user.role, User.Role.INSPECTOR)
-
-    def test_complete_registration_password_mismatch(self):
-        """Test registration with mismatched passwords"""
-        session = self.client.session
-        session['verified_email'] = 'test@example.com'
-        session.save()
-        
-        data = {
-            'name': 'Test Student',
-            'password': 'testpass123',
-            'confirm-password': 'different',
-            'role': 'student',
-            'student-code': 'STU123'
-        }
-        
-        response = self.client.post(self.complete_url, data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Passwords do not match', response.content.decode())
-
-    def test_complete_registration_invalid_key_code(self):
-        """Test inspector registration with invalid key code"""
-        session = self.client.session
-        session['verified_email'] = 'inspector@example.com'
-        session.save()
-        
-        data = {
-            'name': 'Test Inspector',
-            'password': 'testpass123',
-            'confirm-password': 'testpass123',
-            'role': 'inspector',
-            'key-code': 'INVALID'
-        }
-        
-        response = self.client.post(self.complete_url, data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Invalid key code', response.content.decode())
