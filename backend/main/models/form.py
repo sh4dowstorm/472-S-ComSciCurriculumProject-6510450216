@@ -8,6 +8,7 @@ class Form(models.Model) :
     class FormStatus(models.TextChoices) :
         READY_TO_CALC = 'ready to calc'
         DRAFT =  'draft'
+        PENDING = 'pending'
         VERIFIED = 'verified'
         
     class FormType(models.TextChoices) :
