@@ -8,7 +8,7 @@ class Subcategory(models.Model) :
     subcategory_name = models.CharField(max_length=200)
     subcateory_min_credit = models.IntegerField()
     
-    category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category_fk = models.ForeignKey(Category, on_delete=models.CASCADE)
     
     def __str__(self):
         return f'subcategory name {self.subcategory_name}'
