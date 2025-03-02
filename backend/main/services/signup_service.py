@@ -123,6 +123,6 @@ class SignupService() :
         form = Form.objects.create(
             form_status=Form.FormStatus.DRAFT,
             form_type=Form.FormType.GRADUATION_CHECK,
-            user_id=user
+            user_fk=user
         )
         return form
