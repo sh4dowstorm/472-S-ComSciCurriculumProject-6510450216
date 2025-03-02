@@ -8,6 +8,13 @@ This project is about checking the criteria of students to confirm graduation. T
 3. graduation applications
 4. activity sheets (optional).
 
+# How to activate frontend
+To activate frontend run the following command
+> suggest using git bash
+1. `cd frontend/`
+2. `npm install`
+3. `npm run dev`
+
 # How to activate backend
 
 To activate backend run the following command 
@@ -46,3 +53,10 @@ To activate backend run the following command
 ### email for sending OTP code
 1. `EMAIL_HOST_USER = 'xxxxxxxxxx@gmail.com'` change the email
 2. `EMAIL_HOST_PASSWORD = 'xxxxxxxxxxxxxxxx'` change the app password (get the app password from google account)
+
+### how to do unit testing
+1. `cd backend`
+2. `pytest -sv`
+
+> `-s` flag is to show console printing </br>
+> `-v` flag is to show detail
