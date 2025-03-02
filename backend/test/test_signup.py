@@ -52,7 +52,7 @@ class SignupServiceTest(TestCase):
         self.assertEqual(user.role, User.Role.STUDENT)
         
         # Check if graduation form is created
-        self.assertTrue(Form.objects.filter(user_id=user, form_type=Form.FormType.GRADUATION_CHECK).exists())
+        self.assertTrue(Form.objects.filter(user_fk=user, form_type=Form.FormType.GRADUATION_CHECK).exists())
         
     def test_cleanup_otp(self):
         """Test if cleanup_otp deletes all OTP records for a given email"""
@@ -139,7 +139,7 @@ class SignupServiceTest(TestCase):
         """Test if a graduation check form is created for a student"""
         form = SignupService.create_graduation_check_form(self.user)
         self.assertIsNotNone(form)
-        self.assertEqual(form.user_id, self.user)
+        self.assertEqual(form.user_fk, self.user)
         self.assertEqual(form.form_status, Form.FormStatus.DRAFT)
         self.assertEqual(form.form_type, Form.FormType.GRADUATION_CHECK)
 
