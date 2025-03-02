@@ -16,13 +16,13 @@ class CurriculumModelTest(TestCase):
         )
 
         self.category = Category.objects.create(
-            curriculum_id_id=self.curriculum.curriculum_id,
+            curriculum_fk=self.curriculum,
             category_name="หมวดวิชาศึกษาทั่วไป",
             category_min_credit=30
         )
 
         self.subcategory = Subcategory.objects.create(
-            category_id_id=self.category.category_id,
+            category_fk=self.category,
             subcategory_name="กลุ่มสาระอยู่ดีมีสุข",
             subcateory_min_credit=3
         )
@@ -44,7 +44,7 @@ class CurriculumModelTest(TestCase):
         """Test that a category can be created and linked to curriculum"""
         self.assertEqual(self.category.category_name, "หมวดวิชาศึกษาทั่วไป")
         self.assertEqual(self.category.category_min_credit, 30)
-        self.assertEqual(self.category.curriculum_id_id, self.curriculum.curriculum_id)
+        self.assertEqual(self.category.curriculum_fk, self.curriculum)
 
     def test_category_str_method(self):
         """Test the string representation of Category"""
@@ -56,7 +56,7 @@ class CurriculumModelTest(TestCase):
         """Test that a subcategory can be created and linked to category"""
         self.assertEqual(self.subcategory.subcategory_name, "กลุ่มสาระอยู่ดีมีสุข")
         self.assertEqual(self.subcategory.subcateory_min_credit, 3)
-        self.assertEqual(self.subcategory.category_id_id, self.category.category_id)
+        self.assertEqual(self.subcategory.category_fk, self.category)
 
     def test_subcategory_str_method(self):
         """Test the string representation of Subcategory"""
@@ -130,7 +130,7 @@ class CurriculumDataImportTest(TestCase):
             
             # verify this category exists in database
             categories = Category.objects.filter(
-                curriculum_id_id=curriculum.curriculum_id
+                curriculum_fk=curriculum
             )
             
             self.assertIsNotNone(curriculum, f"Curriculum from {json_filename} not found")
@@ -148,14 +148,14 @@ class CurriculumDataImportTest(TestCase):
             
             # Verify counts for this specific curriculum
             actual_categories = Category.objects.filter(
-                curriculum_id_id=curriculum.curriculum_id
+                curriculum_fk=curriculum
             ).count()
             
             actual_subcategories = 0
             
             for category in categories:
                 actual_subcategories += Subcategory.objects.filter(
-                    category_id_id=category.category_id
+                    category_fk=category
                 ).count()
             
             self.assertEqual(
