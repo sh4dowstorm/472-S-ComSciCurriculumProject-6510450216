@@ -3,7 +3,10 @@ import re
 
 from ..models import Enrollment, User, Course
 
-class OCRService(): 
+class OCRService():
+    def __init__(self):
+        self.courses = {course.course_id: course for course in Course.objects.all()}
+        
     def extract_semester(self, item):
         semester_match = re.match(r"(First|Second) Semester (\d{4})", item)
         summer_match = re.match(r"(First|Second)* Summer Session (\d{4})", item)
@@ -16,6 +19,7 @@ class OCRService():
             return f"0/{int(year) - 1 + 543}"
         return None
     
+    #NOTE: passing uid
     def extract_course_info(self, text):
         count = 0
         course_data = {}
@@ -36,23 +40,26 @@ class OCRService():
                 course_id = course_match.group(1)
 
                 # ถ้าไม่มีเกรดข้ามเรื่อยๆจนกว่าจะเจอเกรด
-                grade = None
+                g = None
                 j = i + 1
                 while j < len(text):
                     next_item = text[j].strip()
                     if next_item in ['A', 'B', 'B+', 'C', 'C+', 'D', 'D+', 'F', 'P', 'NP', 'N']:
-                        grade = next_item
+                        g = next_item
                         break
                     j += 1  
 
-                if grade:
-                    course_data[current_semester][course_id] = grade
+                if g:
+                    # s, y = current_semester.split('/')
+                    # e = Enrollment(semester=s, year=y, grade=g, user_fk=User.objects.get(user_id=uid), course_fk=self.courses[course_id])
+                    # print(e)
+                    course_data[current_semester][course_id] = g
                     count += 1
             i += 1  
 
         print("Total courses:", count)
         return course_data
-
+    
     def get_student_info(self, text):
         student_info = {}
         for i, item in enumerate(text):
