@@ -6,6 +6,79 @@ class OCRService():
     def __init__(self):
         self.courses = {course.course_id: course for course in Course.objects.all()}
         
+    def extract_text_from_pdf(self, file_path):
+        with open(file_path, 'rb') as file:
+            doc = fitz.open(file)
+            text = ""
+            for page in doc:
+                text += page.get_text("text") + "\n"
+            return text.split("\n")
+        
+    def get_student_info(self, text):
+        student_info = {}
+        for i, item in enumerate(text):
+            match = re.match(r"\s*STUDENT ID\s+(\d{10})", item)
+            if match:
+                student_info["id"] = match.group(1)
+            
+            match = re.match(r"\s*NAME\s+(.+)", item)
+            if match:
+                student_info["name"] = match.group(1)
+                
+            match = re.match(r"\s*FACULTY OF\s+(.+)", item)
+            if match:
+                student_info["faculty"] = match.group(1)
+            
+            match = re.match(r"\s*FIELD OF STUDY\s+(.+)", item)
+            if match:
+                student_info["field"] = match.group(1)
+                
+            match = re.match(r"\s*DATE OF ADMISSION\s+(.+)", item)
+            if match:
+                student_info["start_year"] = int(match.group(1).split()[2]) + 543
+                
+        return student_info
+    
+    def extract_receipt_info(self, text):
+        receipt_info = {}
+        text_str = " ".join(text)
+        
+        student_id_match = re.search(r"\b(\d{10})\b", " ".join(text))
+        receipt_info["id"] = student_id_match.group(1) 
+
+        name_index = text.index("STUDENT NAME") + 1
+        receipt_info["name"] = text[name_index]
+        
+        academic_year_match = re.search(r"(\d{4}),\s*ภาค(?:ปลาย|ต้น)", " ".join(text))
+        receipt_info["recent_year"] = academic_year_match.group(1) 
+
+        semester_mapping = {"First": 1, "Second": 2, "Summer": 0}
+        semester_match = re.search(r"(First|Second|Summer) (Semester|Sessions)", " ".join(text))
+        receipt_info["semester"] = semester_mapping.get(semester_match.group(1), None) 
+
+        total_fee_match = re.search(r"รวม\s*/\s*TOTAL\s+([\d,]+.\d{2})", " ".join(text))
+        receipt_info["total_fee"] = total_fee_match.group(1) 
+
+        payment_keywords = {
+            "Bank": "ธนาคาร",
+            "Student Loan": "เงินกู้",
+            "Cashier": "แคชเชียร์เช็ค",
+            "Credit": "บัตรเครดิต",
+            "Cash": "เงินสด",
+            "Scholarship": "ทุนการศึกษา",
+            "Org. Project": "ผ่านโครงการ"
+        }
+
+        found_payment_method = None
+        for eng, thai in payment_keywords.items():
+            if thai in text_str or eng in text_str:
+                found_payment_method = eng
+                break
+
+        receipt_info["payment_method"] = found_payment_method
+
+        return receipt_info
+        
     def extract_semester(self, item):
         semester_match = re.match(r"(First|Second) Semester (\d{4})", item)
         summer_match = re.match(r"(First|Second)* Summer Session (\d{4})", item)
@@ -87,37 +160,7 @@ class OCRService():
             else:
                 return False
         return False
+    
+        
 
-    def get_student_info(self, text):
-        student_info = {}
-        for i, item in enumerate(text):
-            match = re.match(r"\s*STUDENT ID\s+(\d{10})", item)
-            if match:
-                student_info["ID"] = match.group(1)
-            
-            match = re.match(r"\s*NAME\s+(.+)", item)
-            if match:
-                student_info["Name"] = match.group(1)
-                
-            match = re.match(r"\s*FACULTY OF\s+(.+)", item)
-            if match:
-                student_info["Faculty"] = match.group(1)
-            
-            match = re.match(r"\s*FIELD OF STUDY\s+(.+)", item)
-            if match:
-                student_info["Field"] = match.group(1)
-                
-            match = re.match(r"\s*DATE OF ADMISSION\s+(.+)", item)
-            if match:
-                student_info["Start_year"] = int(match.group(1).split()[2]) + 543
-                
-        return student_info
-
-    def extract_text_from_pdf(self, file_path):
-        with open(file_path, 'rb') as file:
-            doc = fitz.open(file)
-            text = ""
-            for page in doc:
-                text += page.get_text("text") + "\n"
-            return text.split("\n")
         
