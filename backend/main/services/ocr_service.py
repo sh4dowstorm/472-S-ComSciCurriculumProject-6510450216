@@ -46,7 +46,7 @@ class OCRService():
         student_id_match = re.search(r"\b(\d{10})\b", " ".join(text))
         receipt_info["id"] = student_id_match.group(1) 
 
-        name_index = text.index("STUDENT NAME") + 1
+        name_index = text.index("STUDENT NAME") + 2 # +2 for ENG name
         receipt_info["name"] = text[name_index]
         
         academic_year_match = re.search(r"(\d{4}),\s*ภาค(?:ปลาย|ต้น)", " ".join(text))
