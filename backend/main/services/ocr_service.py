@@ -1,7 +1,8 @@
 import fitz
 import re
-
+import unicodedata
 from ..models import Enrollment, User, Course
+from django.core.exceptions import ObjectDoesNotExist
 
 class OCRService():
     def __init__(self):
@@ -59,6 +60,27 @@ class OCRService():
 
         print("Total courses:", count)
         return course_data
+    
+    def get_activiy_status(self, text, uid):
+        id_match = re.match(r".+\s+(\d{10})", text[1])
+        
+        if id_match:
+            matched_uid = id_match.group(1)
+            
+            if matched_uid == uid:
+                try:
+                    User.objects.get(student_code=uid)
+                
+                    if "PASS" in text:
+                        return True
+                    else:
+                        return False
+                except ObjectDoesNotExist:
+                    print(f"User with student_code {uid} not found.")
+                    return False
+            else:
+                return False
+        return False
     
     def get_student_info(self, text):
         student_info = {}
