@@ -9,7 +9,13 @@ class OCRResult(TestCase):
         self.ocr = OCRService()
         self.grade_text = self.ocr.extract_text_from_pdf(settings.BASE_DIR/"main/utils/OCR_transcript_test.pdf")
         self.activity_text = self.ocr.extract_text_from_pdf(settings.BASE_DIR/"main/utils/activity_transcript_test.pdf")
-        
+        self.soodlor = User.objects.create(
+            email = "soodlorlnwza@gmail.com",
+            password = "lorpainhai081",
+            name = "soodlor mawa",
+            student_code = "6510450081",
+            role = "student"
+        )
     def test_ocr(self):
         print(self.grade_text)
         print("==============================================================")
@@ -19,7 +25,7 @@ class OCRResult(TestCase):
         print("activity status: ", self.ocr.get_activiy_status(self.activity_text, "6510450861"))
         
     def test_course_info(self):
-        print(self.ocr.extract_course_info(self.grade_text))
+        print(self.ocr.extract_course_info(self.grade_text, self.soodlor))
     
     def test_student_info(self):
         print(self.ocr.get_student_info(self.grade_text))

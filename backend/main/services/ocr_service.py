@@ -1,6 +1,4 @@
-import fitz
-import re
-import unicodedata
+import fitz, re
 from ..models import Enrollment, User, Course
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -19,9 +17,8 @@ class OCRService():
             _, year = summer_match.groups()
             return f"0/{int(year) - 1 + 543}"
         return None
-    
-    #NOTE: passing uid
-    def extract_course_info(self, text):
+            
+    def extract_course_info(self, text, user):
         count = 0
         course_data = {}
         current_semester = None
@@ -41,21 +38,30 @@ class OCRService():
                 course_id = course_match.group(1)
 
                 # ถ้าไม่มีเกรดข้ามเรื่อยๆจนกว่าจะเจอเกรด
-                g = None
+                grading = None
                 j = i + 1
                 while j < len(text):
                     next_item = text[j].strip()
                     if next_item in ['A', 'B', 'B+', 'C', 'C+', 'D', 'D+', 'F', 'P', 'NP', 'N']:
-                        g = next_item
+                        grading = next_item
                         break
                     j += 1  
 
-                if g:
-                    # s, y = current_semester.split('/')
-                    # e = Enrollment(semester=s, year=y, grade=g, user_fk=User.objects.get(user_id=uid), course_fk=self.courses[course_id])
-                    # print(e)
-                    course_data[current_semester][course_id] = g
+                if grading:
+                    course = self.courses.get(course_id)
+                    course_data[current_semester][course_id] = grading # for debug
                     count += 1
+                    if course:
+                        s, y = current_semester.split('/')
+                        try:
+                            Enrollment.objects.create(
+                                semester=s, 
+                                year=y, grade=grading, 
+                                user_fk=user, 
+                                course_fk=self.courses[course_id]
+                            )
+                        except ObjectDoesNotExist:
+                            print(f"course with course_id {course_id} not found.")
             i += 1  
 
         print("Total courses:", count)
@@ -81,7 +87,7 @@ class OCRService():
             else:
                 return False
         return False
-    
+
     def get_student_info(self, text):
         student_info = {}
         for i, item in enumerate(text):
