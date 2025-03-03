@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 class OCRService():
     def __init__(self):
         self.courses = {course.course_id: course for course in Course.objects.all()}
+        self.semester_mapping = {"Summer":0, "First":1, "Second":2}
         
     def extract_text_from_pdf(self, file_path):
         with open(file_path, 'rb') as file:
@@ -16,6 +17,9 @@ class OCRService():
         
     def get_student_info(self, text):
         student_info = {}
+        recent_year = None
+        recent_semester = None
+        
         for i, item in enumerate(text):
             match = re.match(r"\s*STUDENT ID\s+(\d{10})", item)
             if match:
@@ -36,6 +40,19 @@ class OCRService():
             match = re.match(r"\s*DATE OF ADMISSION\s+(.+)", item)
             if match:
                 student_info["start_year"] = int(match.group(1).split()[2]) + 543
+            
+            semester_match = re.match(r"\s*(First|Second)( Semester| Summer Session) (\d{4})", item)
+            if semester_match:
+                semester = self.semester_mapping.get(semester_match.group(1), None)
+                year = int(semester_match.group(3)) + 543
+                
+                if not recent_year or (year > recent_year) or (semester > recent_semester):
+                    recent_year = year
+                    recent_semester = semester
+                    
+        if recent_year and recent_semester:
+            student_info["recent_year"] = recent_year
+            student_info["recent_semester"] = recent_semester
                 
         return student_info
     
@@ -50,11 +67,10 @@ class OCRService():
         receipt_info["name"] = text[name_index]
         
         academic_year_match = re.search(r"(\d{4}),\s*ภาค(?:ปลาย|ต้น)", " ".join(text))
-        receipt_info["recent_year"] = academic_year_match.group(1) 
+        receipt_info["year"] = academic_year_match.group(1) 
 
-        semester_mapping = {"First": 1, "Second": 2, "Summer": 0}
-        semester_match = re.search(r"(First|Second|Summer) (Semester|Sessions)", " ".join(text))
-        receipt_info["semester"] = semester_mapping.get(semester_match.group(1), None) 
+        semester_match = re.search(r"(First|Second)( Semester| Summer Session)", " ".join(text))
+        receipt_info["semester"] = self.semester_mapping.get(semester_match.group(1), None) 
 
         total_fee_match = re.search(r"รวม\s*/\s*TOTAL\s+([\d,]+.\d{2})", " ".join(text))
         receipt_info["total_fee"] = total_fee_match.group(1) 
