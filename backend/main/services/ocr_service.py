@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 class OCRService():
     def __init__(self):
         self.semester_mapping = {"Summer":0, "First":1, "Second":2}
+        self.grade_mapping = {'A':4, 'B':3, 'B+':3.5, 'C':2, 'C+':2.5, 'D':1, 'D+':1.5, 'F':0} #NOTE: handle DecimalField
         
     def extract_text_from_pdf(self, file_path):
         with open(file_path, 'rb') as file:
@@ -14,11 +15,12 @@ class OCRService():
                 text += page.get_text("text") + "\n"
             return text.split("\n")
         
-    def get_valid_course(course, start_year):
-        _, year = course.course_id.split('-')
-        year = int(year)
-        
-        return year <= start_year
+    def get_valid_course(self, course, start_year):
+        if '-' in course.course_id:
+            _, course_year = course.course_id.split('-')
+            course_year = int(course_year)
+            return (start_year - 5) < course_year <= start_year
+        return True
     
     def get_student_info(self, text):
         student_info = {}
@@ -113,9 +115,9 @@ class OCRService():
         return None
             
     def extract_course_info(self, text, user):
-        courses = {course.course_id: course for course in Course.objects.all()}
+        start_year = int(str(user.student_code)[:2])
+        courses = {course.course_id: course for course in Course.objects.all() if self.get_valid_course(course, start_year)}
         count = 0
-        course_data = {}
         current_semester = None
 
         i = 0
@@ -125,42 +127,46 @@ class OCRService():
             semester = self.extract_semester(item)
             if semester:
                 current_semester = semester
-                course_data.setdefault(current_semester, {})
 
             # match course id and course name
             course_match = re.match(r"(\d{8})\s+(.+)", item) 
             if course_match and current_semester:
                 course_id = course_match.group(1)
 
+                matching_courses = [course for course in courses.values() if course.course_id.startswith(course_id)]
+                
+                if matching_courses:
+                    selected_course = max(matching_courses, key=lambda c: int(c.course_id.split('-')[-1]) if '-' in c.course_id else 0)
+                    course = selected_course
+                else:
+                    raise ValueError(f"course with {course_id} not found.")
+                    
                 # ถ้าไม่มีเกรดข้ามเรื่อยๆจนกว่าจะเจอเกรด
                 grading = None
                 j = i + 1
                 while j < len(text):
                     next_item = text[j].strip()
                     if next_item in ['A', 'B', 'B+', 'C', 'C+', 'D', 'D+', 'F', 'P', 'NP', 'N']:
-                        grading = next_item
+                        grading = self.grade_mapping.get(next_item, -1) #NOTE: handle DecimalField
                         break
                     j += 1  
 
                 if grading:
-                    course = self.courses.get(course_id)
-                    course_data[current_semester][course_id] = grading # for debug
-                    count += 1
-                    if course:
-                        s, y = current_semester.split('/')
-                        try:
-                            Enrollment.objects.create(
-                                semester=s, 
-                                year=y, grade=grading, 
-                                user_fk=user, 
-                                course_fk=self.courses[course_id]
-                            )
-                        except ObjectDoesNotExist:
-                            print(f"course with course_id {course_id} not found.")
+                    s, y = current_semester.split('/')
+                    try:
+                        print(Enrollment.objects.create(
+                            semester=s, 
+                            year=y, 
+                            grade=grading, 
+                            user_fk=user, 
+                            course_fk=course
+                        ))
+                        count += 1
+                    except ObjectDoesNotExist:
+                        print(f"course with course_id {course_id} not found.")
             i += 1  
-
+            
         print("Total courses:", count)
-        return course_data
     
     def get_activiy_status(self, text, uid):
         id_match = re.match(r".+\s+(\d{10})", text[1])

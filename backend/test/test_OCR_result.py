@@ -14,7 +14,7 @@ class OCRResult(TestCase):
             email = "soodlorlnwza@gmail.com",
             password = "lorpainhai081",
             name = "soodlor mawa",
-            student_code = "6510450081",
+            student_code = "6510450861",
             role = "student"
         )
     def test_ocr(self):
