@@ -4,7 +4,6 @@ from django.core.exceptions import ObjectDoesNotExist
 
 class OCRService():
     def __init__(self):
-        self.courses = {course.course_id: course for course in Course.objects.all()}
         self.semester_mapping = {"Summer":0, "First":1, "Second":2}
         
     def extract_text_from_pdf(self, file_path):
@@ -15,6 +14,12 @@ class OCRService():
                 text += page.get_text("text") + "\n"
             return text.split("\n")
         
+    def get_valid_course(course, start_year):
+        _, year = course.course_id.split('-')
+        year = int(year)
+        
+        return year <= start_year
+    
     def get_student_info(self, text):
         student_info = {}
         recent_year = None
@@ -108,6 +113,7 @@ class OCRService():
         return None
             
     def extract_course_info(self, text, user):
+        courses = {course.course_id: course for course in Course.objects.all()}
         count = 0
         course_data = {}
         current_semester = None
