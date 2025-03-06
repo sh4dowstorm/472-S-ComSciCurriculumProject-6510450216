@@ -13,7 +13,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  width: 150px;
   height: 28px;
   padding: 0 24px;
   background-color: gainsboro;
@@ -29,13 +29,14 @@
 }
 
 .upload-icon {
-  margin-right: 10px;
+  margin-right: 14px;
   font-size: 24px; /* icon size */
 }
 
 .delete-icon {
-  margin-left: 12px;
+  padding: 1px;
+  margin-left: 16px;
   cursor: pointer;
   color: red;
-  font-size: 36px; /* icon size */
+  font-size: 28px; /* icon size */
 }
