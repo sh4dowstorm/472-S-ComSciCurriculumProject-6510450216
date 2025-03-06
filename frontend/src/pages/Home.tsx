@@ -20,7 +20,7 @@ const HomePage: React.FC = () => {
       <Header />
       <div className="content">
         <h1>Home Page</h1>
-        <p>This is the home page. มันไม่อยู่จริงในโปรเจค</p>
+        <p>This is the home page. มันไม่มีอยู่จริงในโปรเจค</p>
         <div className="button-container">
           <Button
             text="To Credit Check"
