@@ -10,7 +10,7 @@ interface UploadFileButtonProps {
 
 const UploadFileButton: React.FC<UploadFileButtonProps> = ({
   onChange,
-  buttonText = "Upload File",
+  buttonText = "แนบไฟล์",
   onRemoveFile,
 }) => {
   const [fileName, setFileName] = useState<string | null>(null);

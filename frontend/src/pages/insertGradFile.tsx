@@ -89,7 +89,7 @@ const InsertGradFile: React.FC = () => {
                 checked={selectedPage === "insertgradfile"}
                 onChange={() => handleNavigate("insertgradfile")}
               />
-              Insert Graduation File
+              ต้องการเช็คจบ
             </label>
             <label>
               <input
@@ -99,12 +99,12 @@ const InsertGradFile: React.FC = () => {
                 checked={selectedPage === "creditcheck"}
                 onChange={() => handleNavigate("creditcheck")}
               />
-              Credit Check
+              ต้องการเช็คหน่วยกิต
             </label>
           </div>
           <p />
           <div className="upload-container">
-            <span className="upload-text"> Upload Your Transcript*</span>
+            <span className="upload-text"> แนบไฟล์ผลการเรียน*</span>
             <UploadFileButton
               onChange={handleFileChange}
               onRemoveFile={handleRemoveFile}
@@ -113,7 +113,7 @@ const InsertGradFile: React.FC = () => {
           <p />
           <div className="upload-container">
             <span className="upload-text">
-              Upload Your Activity Transcript*
+              แนบไฟล์กิจกรรม*
             </span>
             <UploadFileButton
               onChange={handleFileChange}
@@ -122,7 +122,7 @@ const InsertGradFile: React.FC = () => {
           </div>
           <p />
           <div className="upload-container">
-            <span className="upload-text">Upload Your Receipt*</span>
+            <span className="upload-text">แนบหลักฐานการชำระค่าเทอม*</span>
             <UploadFileButton
               onChange={handleFileChange}
               onRemoveFile={handleRemoveFile}
