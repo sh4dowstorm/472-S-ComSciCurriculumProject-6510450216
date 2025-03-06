@@ -4,13 +4,15 @@ import Header from "../components/header";
 import Button from "../components/button";
 import UploadFileButton from "../components/uploadfile-button";
 import "../styles/insertGradFile.css";
-import { IoWarningOutline} from "react-icons/io5";
+import { IoWarningOutline } from "react-icons/io5";
 
 const InsertGradFile: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [selectedPage, setSelectedPage] = useState("insertgradfile");
   const [message, setMessage] = useState<string | null>(null);
-  const [messageType, setMessageType] = useState<"error" | "success" | null>(null);
+  const [messageType, setMessageType] = useState<"error" | "success" | null>(
+    null
+  );
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [navigateTo, setNavigateTo] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -22,7 +24,7 @@ const InsertGradFile: React.FC = () => {
 
   const handleRemoveFile = () => {
     setFile(null);
-  }
+  };
 
   const handleSubmit = () => {
     if (!file) {
@@ -103,33 +105,67 @@ const InsertGradFile: React.FC = () => {
           <p />
           <div className="upload-container">
             <span className="upload-text"> Upload Your Transcript*</span>
-            <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
+            <UploadFileButton
+              onChange={handleFileChange}
+              onRemoveFile={handleRemoveFile}
+            />
           </div>
           <p />
           <div className="upload-container">
-            <span className="upload-text">Upload Your Activity Transcript*</span>
-            <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
+            <span className="upload-text">
+              Upload Your Activity Transcript*
+            </span>
+            <UploadFileButton
+              onChange={handleFileChange}
+              onRemoveFile={handleRemoveFile}
+            />
           </div>
           <p />
           <div className="upload-container">
             <span className="upload-text">Upload Your Receipt*</span>
-            <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
+            <UploadFileButton
+              onChange={handleFileChange}
+              onRemoveFile={handleRemoveFile}
+            />
           </div>
           {message && (
             <div className="message-container">
-              <p className={messageType === "success" ? "success-message" : "error-message"}>{message}</p>
+              <p
+                className={
+                  messageType === "success"
+                    ? "success-message"
+                    : "error-message"
+                }
+              >
+                {message}
+              </p>
             </div>
           )}
           <p />
-          <Button text="ตรวจสอบไฟล์" className="button" onClick={handleSubmit} />
+          <Button
+            text="ตรวจสอบไฟล์"
+            className="button"
+            onClick={handleSubmit}
+          />
         </div>
       </div>
       {showConfirmPopup && (
         <div className="confirm-popup">
           <IoWarningOutline className="warning-icon" />
-          <p>หากเปลี่ยนเป็นฟอร์ม ไฟล์ที่แนบไว้จะหายไป คุณต้องการดำเนินการต่อหรือไม่?</p>
-          <Button text="ยืนยัน" className="confirm-button" onClick={confirmNavigation}/>
-          <Button text="ยกเลิก" className="cancel-button" onClick={cancelNavigation}/>
+          <p>
+            หากเปลี่ยนเป็นฟอร์ม ไฟล์ที่แนบไว้จะหายไป
+            คุณต้องการดำเนินการต่อหรือไม่?
+          </p>
+          <Button
+            text="ยืนยัน"
+            className="confirm-button"
+            onClick={confirmNavigation}
+          />
+          <Button
+            text="ยกเลิก"
+            className="cancel-button"
+            onClick={cancelNavigation}
+          />
         </div>
       )}
     </div>

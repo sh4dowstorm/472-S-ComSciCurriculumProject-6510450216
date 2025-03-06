@@ -41,7 +41,11 @@ const UploadFileButton: React.FC<UploadFileButtonProps> = ({
       <label className={"uploadfile-button"}>
         {!fileName && <IoCloudUploadOutline className="upload-icon" />}
         {fileName || buttonText}
-        <input type="file" onChange={handleFileChange} />
+        <input
+          type="file"
+          onChange={handleFileChange}
+          key={fileName} 
+        />
       </label>
       {fileName && (
         <IoCloseCircleOutline
