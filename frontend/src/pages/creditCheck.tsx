@@ -4,6 +4,7 @@ import Header from "../components/header";
 import Button from "../components/button";
 import UploadFileButton from "../components/uploadfile-button";
 import "../styles/creditCheck.css";
+import { IoWarningOutline } from "react-icons/io5";
 
 const CreditCheckPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -11,6 +12,8 @@ const CreditCheckPage: React.FC = () => {
   const [messageType, setMessageType] = useState<"error" | "success" | null>(
     null
   );
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [navigateTo, setNavigateTo] = useState<string | null>(null);
   const [selectedPage, setSelectedPage] = useState("creditcheck");
   const navigate = useNavigate();
 
@@ -29,7 +32,7 @@ const CreditCheckPage: React.FC = () => {
       setMessageType("error");
       return;
     }
-    if (file.type !== "application/pdf") {
+    if (file && file.type !== "application/pdf") {
       setMessage("ไฟล์แนบต้องเป็น PDF");
       setMessageType("error");
     } else {
@@ -52,8 +55,26 @@ const CreditCheckPage: React.FC = () => {
   }, [message]);
 
   const handleNavigate = (page: string) => {
-    setSelectedPage(page);
-    navigate(`/${page}`);
+    if (file) {
+      setShowConfirmPopup(true);
+      setNavigateTo(page);
+    } else {
+      setSelectedPage(page);
+      navigate(`/${page}`);
+    }
+  };
+
+  const confirmNavigation = () => {
+    if (navigateTo) {
+      setSelectedPage(navigateTo);
+      navigate(`/${navigateTo}`);
+    }
+    setShowConfirmPopup(false);
+  };
+
+  const cancelNavigation = () => {
+    setShowConfirmPopup(false);
+    setNavigateTo(null);
   };
 
   return (
@@ -88,14 +109,14 @@ const CreditCheckPage: React.FC = () => {
             <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
           <p />
-          <div className="upload-container faded">
+          <div className="upload-section faded">
             <span className="upload-text">
               แนบไฟล์กิจกรรม*
             </span>
             <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
           <p />
-          <div className="upload-container faded">
+          <div className="upload-section faded">
             <span className="upload-text">แนบหลักฐานการชำระค่าเทอม*</span>
             <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
@@ -116,6 +137,25 @@ const CreditCheckPage: React.FC = () => {
           <Button text="ตรวจสอบไฟล์" className="button" onClick={handleSubmit} />
         </div>
       </div>
+      {showConfirmPopup && (
+        <div className="confirm-popup">
+          <IoWarningOutline className="warning-icon" />
+          <p>
+            หากเปลี่ยนเป็นฟอร์ม ไฟล์ที่แนบไว้จะหายไป
+            คุณต้องการดำเนินการต่อหรือไม่?
+          </p>
+          <Button
+            text="ยืนยัน"
+            className="confirm-button"
+            onClick={confirmNavigation}
+          />
+          <Button
+            text="ยกเลิก"
+            className="cancel-button"
+            onClick={cancelNavigation}
+          />
+        </div>
+      )}
     </div>
   );
 };

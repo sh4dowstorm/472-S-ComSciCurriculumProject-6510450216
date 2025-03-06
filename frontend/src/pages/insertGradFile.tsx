@@ -10,9 +10,7 @@ const InsertGradFile: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [selectedPage, setSelectedPage] = useState("insertgradfile");
   const [message, setMessage] = useState<string | null>(null);
-  const [messageType, setMessageType] = useState<"error" | "success" | null>(
-    null
-  );
+  const [messageType, setMessageType] = useState<"error" | "success" | null>(null);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [navigateTo, setNavigateTo] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -102,8 +100,7 @@ const InsertGradFile: React.FC = () => {
               ต้องการเช็คหน่วยกิต
             </label>
           </div>
-          <p />
-          <div className="upload-container">
+          <div className="upload-section">
             <span className="upload-text"> แนบไฟล์ผลการเรียน*</span>
             <UploadFileButton
               onChange={handleFileChange}
@@ -111,7 +108,7 @@ const InsertGradFile: React.FC = () => {
             />
           </div>
           <p />
-          <div className="upload-container">
+          <div className="upload-section">
             <span className="upload-text">
               แนบไฟล์กิจกรรม*
             </span>
@@ -121,7 +118,7 @@ const InsertGradFile: React.FC = () => {
             />
           </div>
           <p />
-          <div className="upload-container">
+          <div className="upload-section">
             <span className="upload-text">แนบหลักฐานการชำระค่าเทอม*</span>
             <UploadFileButton
               onChange={handleFileChange}
@@ -130,42 +127,19 @@ const InsertGradFile: React.FC = () => {
           </div>
           {message && (
             <div className="message-container">
-              <p
-                className={
-                  messageType === "success"
-                    ? "success-message"
-                    : "error-message"
-                }
-              >
-                {message}
-              </p>
+              <p className={messageType === "success" ? "success-message" : "error-message"}>{message}</p>
             </div>
           )}
           <p />
-          <Button
-            text="ตรวจสอบไฟล์"
-            className="button"
-            onClick={handleSubmit}
-          />
+          <Button text="ตรวจสอบไฟล์" className="button" onClick={handleSubmit} />
         </div>
       </div>
       {showConfirmPopup && (
         <div className="confirm-popup">
           <IoWarningOutline className="warning-icon" />
-          <p>
-            หากเปลี่ยนเป็นฟอร์ม ไฟล์ที่แนบไว้จะหายไป
-            คุณต้องการดำเนินการต่อหรือไม่?
-          </p>
-          <Button
-            text="ยืนยัน"
-            className="confirm-button"
-            onClick={confirmNavigation}
-          />
-          <Button
-            text="ยกเลิก"
-            className="cancel-button"
-            onClick={cancelNavigation}
-          />
+          <p>หากเปลี่ยนเป็นฟอร์ม ไฟล์ที่แนบไว้จะหายไป คุณต้องการดำเนินการต่อหรือไม่?</p>
+          <Button text="ยืนยัน" className="confirm-button" onClick={confirmNavigation}/>
+          <Button text="ยกเลิก" className="cancel-button" onClick={cancelNavigation}/>
         </div>
       )}
     </div>
