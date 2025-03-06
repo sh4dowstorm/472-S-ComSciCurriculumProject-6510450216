@@ -16,10 +16,9 @@
   position: relative;
 }
 
-.credit-check-page .credit-check-container h1 {
-  font-size: 2em;
-  font-weight: 500;
-  margin-bottom: 1em;
+.credit-check-page .credit-check-container input[type="file"],
+.credit-check-page .credit-check-container .button {
+  margin: 1em auto; /* Center buttons horizontally */
 }
 
 .upload-section {
