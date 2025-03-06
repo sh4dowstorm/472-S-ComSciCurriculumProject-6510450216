@@ -116,7 +116,7 @@ const CreditCheckPage: React.FC = () => {
             <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
           <p />
-          <div className="upload-section` faded">
+          <div className="upload-section faded">
             <span className="upload-text">แนบหลักฐานการชำระค่าเทอม*</span>
             <UploadFileButton onChange={handleFileChange} onRemoveFile={handleRemoveFile} />
           </div>
