@@ -1,1 +1,1 @@
-from .minio_client import minio_client, upload_to_minio, generate_presigned_url
+from .minio_client import minio_client, upload_to_minio, generate_presigned_url, download_from_minio

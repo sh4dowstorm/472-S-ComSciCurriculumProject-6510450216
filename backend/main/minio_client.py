@@ -31,6 +31,14 @@ def upload_to_minio(file_data, file_name):
         print(f"Error during MinIO upload: {e}")
         return False
 
+def download_from_minio(file_name):
+    try:
+        file = minio_client.get_object(settings.MINIO_BUCKET, file_name)
+        return file
+    except S3Error as e:
+        print(f"Error downloading file from MinIO: {e}")
+        return None
+    
 def generate_presigned_url(file_name):
     try:
         return minio_client.presigned_get_object(settings.MINIO_BUCKET, file_name)

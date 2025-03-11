@@ -19,15 +19,16 @@ class FileUploadView(APIView):
                     request.FILES.get("activity"),
                     request.FILES.get("receipt")
                 ]
-                # form.form_type
-                if not all(files):
-                    return Response({"message": "Files are missing.", "files": [f.name if f else None for f in files]}, status=HTTP_400_BAD_REQUEST)
+            # form.form_type
+            # if not all(files):
+            #     return Response({"message": "Files are missing.", "files": [f.name if f else None for f in files]}, status=HTTP_400_BAD_REQUEST)
+            # else:
+                ocr_service = OCRService()
+                validation_result = ocr_service.check_validation(files)
+                if validation_result.get("status") == "success":
+                    return Response(validation_result, status=HTTP_200_OK)
                 else:
-                    ocr = OCRService()
-                    if ocr.check_validation(files):
-                        return Response({"message": "Files are valid.", "validation": 1}, status=HTTP_200_OK)
-                    else:
-                        return Response({"message": "Files are invalid"}, status=HTTP_400_BAD_REQUEST)
+                    return Response(validation_result, status=HTTP_400_BAD_REQUEST)
             # except Form.DoesNotExist:
             #     return Response({"message": "Form not found."}, status=HTTP_400_BAD_REQUEST)
                 

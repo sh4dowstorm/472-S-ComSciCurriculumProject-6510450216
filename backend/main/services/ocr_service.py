@@ -2,7 +2,7 @@ import fitz, re
 from ..models import Enrollment, User, Course, Form, VerificationResult
 from django.core.exceptions import ObjectDoesNotExist
 from io import BytesIO
-from ..minio_client import upload_to_minio
+from ..minio_client import upload_to_minio, download_from_minio
 
 class OCRService():
     def __init__(self):
@@ -206,35 +206,66 @@ class OCRService():
             
         return True
         
+    #NOTE: parameter user_id and form_id
     def check_validation(self, files):
             user = User(student_code="6510450861")
+            # user = User.objects.get(student_code=user_id)
             # form = Form.objects.get(form_id=form_id)
             
-            t, a, r = False, False, False
+            response = {
+                "transcript": {"valid": False, "message": ""},
+                "activity": {"valid": False, "message": ""},
+                "receipt": {"valid": False, "message": ""}
+            }
+
             if files[0]:
                 transcript = self.extract_text_from_pdf(files[0])
                 st_info = self.get_student_info(transcript)
-                if (st_info["id"] == user.student_code) and (self.is_valid_transcript(transcript)) and (st_info["field"].lower() == "computer science"):
-                    t = True
-                    upload_to_minio(files[0], f"{user.student_code}/transcript.pdf")
-                if files[1]:
-                    activity = self.extract_text_from_pdf(files[1])
-                    if (self.is_valid_activity(activity, user.student_code) == user.student_code):
-                        a = True
-                        upload_to_minio(files[1], f"{user.student_code}/activity.pdf")
-                if files[2]:
-                    receipt = self.extract_text_from_pdf(files[2])
-                    if self.extract_receipt_info(receipt)["id"] == user.student_code:
-                        r = True
-                        upload_to_minio(files[2], f"{user.student_code}/receipt.pdf")
-            
-            if t and a and r:
+                
+                if st_info["id"] == user.student_code:
+                    if self.is_valid_transcript(transcript):
+                        if st_info["field"].lower() == "computer science":
+                            response["transcript"]["valid"] = True
+                            upload_to_minio(files[0], f"{user.student_code}/transcript.pdf")
+                        else:
+                            response["transcript"]["message"] = "Invalid field in transcript (should be 'Computer Science')."
+                    else:
+                        response["transcript"]["message"] = "Invalid transcript format."
+                else:
+                    response["transcript"]["message"] = "Student ID in transcript does not match."
+
+            if files[1]:
+                activity = self.extract_text_from_pdf(files[1])
+                
+                if self.is_valid_activity(activity, user.student_code) == user.student_code:
+                    response["activity"]["valid"] = True
+                    upload_to_minio(files[1], f"{user.student_code}/activity.pdf")
+                else:
+                    response["activity"]["message"] = "Invalid or mismatched activity data."
+
+            if files[2]:
+                receipt = self.extract_text_from_pdf(files[2])
+                
+                if self.extract_receipt_info(receipt)["id"] == user.student_code:
+                    response["receipt"]["valid"] = True
+                    upload_to_minio(files[2], f"{user.student_code}/receipt.pdf")
+                else:
+                    response["receipt"]["message"] = "Receipt ID does not match student ID."
+
+
+            if all(file["valid"] for file in response.values()):
                 VerificationResult.objects.create(
                     result_status=VerificationResult.VerificationResult.NOT_PASS,
                     activity_status=VerificationResult.VerificationResult.NOT_PASS,
                     # fee_status=VerificationResult.VerificationResult.NOT_PASS,
                     # form_fk=form
                 )
-                return True
+                return {"status": "success", "message": "All files are valid."}
+                
+                # file = download_from_minio(f"{user.student_code}/transcript.pdf")
             else:
-                return False
+                return {
+                    "status": "failure",
+                    "message": "Some files failed validation.",
+                    "errors": response
+                }
