@@ -2,6 +2,7 @@ import fitz, re
 from ..models import Enrollment, User, Course, Form, VerificationResult
 from django.core.exceptions import ObjectDoesNotExist
 from io import BytesIO
+from ..minio_client import upload_to_minio
 
 class OCRService():
     def __init__(self):
@@ -179,11 +180,9 @@ class OCRService():
         id_match = re.match(r".+\s+(\d{10})", text[1])
         if id_match:
             matched_uid = id_match.group(1)
-            if matched_uid == uid:
-                return True
-            else:
-                return False
-        return False
+            return matched_uid
+        else:
+            return None
     
     def is_valid_transcript(self, text):
         transcript_patterns = [
@@ -217,13 +216,17 @@ class OCRService():
                 st_info = self.get_student_info(transcript)
                 if (st_info["id"] == user.student_code) and (self.is_valid_transcript(transcript)) and (st_info["field"].lower() == "computer science"):
                     t = True
+                    upload_to_minio(files[0], f"{user.student_code}/transcript.pdf")
                 if files[1]:
                     activity = self.extract_text_from_pdf(files[1])
-                    a = self.is_valid_activity(activity, user.student_code)
+                    if (self.is_valid_activity(activity, user.student_code) == user.student_code):
+                        a = True
+                        upload_to_minio(files[1], f"{user.student_code}/activity.pdf")
                 if files[2]:
                     receipt = self.extract_text_from_pdf(files[2])
                     if self.extract_receipt_info(receipt)["id"] == user.student_code:
                         r = True
+                        upload_to_minio(files[2], f"{user.student_code}/receipt.pdf")
             
             if t and a and r:
                 VerificationResult.objects.create(

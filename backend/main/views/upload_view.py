@@ -8,14 +8,6 @@ from ..services import OCRService
 from ..serializers import FileUploadSerializer
 from django.conf import settings
 
-
-minio_client = Minio(
-    "localhost:9000",
-    access_key=settings.MINIO_ACCESS_KEY,
-    secret_key=settings.MINIO_SECRET_KEY,
-    secure=False
-)
-
 class FileUploadView(APIView):
     def post(self, request):
         serializer = FileUploadSerializer(data=request.data)
