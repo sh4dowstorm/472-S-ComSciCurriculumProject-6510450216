@@ -102,6 +102,9 @@ DATABASES = {
     }
 }
 
+# Minio settings
+MINIO_ACCESS_KEY = ENVIRON('MINIO_ACCESS_KEY')
+MINIO_SECRET_KEY = ENVIRON('MINIO_SECRET_KEY')
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

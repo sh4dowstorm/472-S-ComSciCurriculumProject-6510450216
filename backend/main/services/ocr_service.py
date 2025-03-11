@@ -1,19 +1,26 @@
 import fitz, re
-from ..models import Enrollment, User, Course
+from ..models import Enrollment, User, Course, Form, VerificationResult
 from django.core.exceptions import ObjectDoesNotExist
+from io import BytesIO
 
 class OCRService():
     def __init__(self):
         self.semester_mapping = {"Summer":0, "First":1, "Second":2}
         self.grade_mapping = {'A':4, 'B':3, 'B+':3.5, 'C':2, 'C+':2.5, 'D':1, 'D+':1.5, 'F':0} #NOTE: handle DecimalField
         
-    def extract_text_from_pdf(self, file_path):
+    """def extract_text_from_pdf(self, file_path):
         with open(file_path, 'rb') as file:
             doc = fitz.open(file)
             text = ""
             for page in doc:
                 text += page.get_text("text") + "\n"
-            return text.split("\n")
+            return text.split("\n")"""
+        
+    def extract_text_from_pdf(self, uploaded_file):
+        file_stream = BytesIO(uploaded_file.read())  # โหลดไฟล์เข้า memory
+        with fitz.open(stream=file_stream, filetype="pdf") as doc:
+            text = "\n".join([page.get_text("text") for page in doc])  # ดึงข้อความจากทุกหน้า
+        return text.split("\n")
         
     def get_valid_course(self, course, start_year):
         if '-' in course.course_id:
@@ -168,27 +175,63 @@ class OCRService():
             
         print("Total courses:", count)
     
-    def get_activiy_status(self, text, uid):
+    def is_valid_activity(self, text, uid):
         id_match = re.match(r".+\s+(\d{10})", text[1])
-        
         if id_match:
             matched_uid = id_match.group(1)
-            
             if matched_uid == uid:
-                try:
-                    User.objects.get(student_code=uid)
-                
-                    if "PASS" in text:
-                        return True
-                    else:
-                        return False
-                except ObjectDoesNotExist:
-                    print(f"User with student_code {uid} not found.")
-                    return False
+                return True
             else:
                 return False
         return False
     
+    def is_valid_transcript(self, text):
+        transcript_patterns = [
+            r"KASETSART UNIVERSITY",
+            r"THAILAND",
+            r"STUDENT ID\s+(\d{10})",
+            r"NAME\s+([A-Za-z.\s]+)",
+            r"ID NO\.\s+([\d\s]+)",
+            r"PLACE OF BIRTH\s+([A-Za-z]+)",
+            r"DATE OF ADMISSION\s+([A-Za-z]+\s+\d{1,2},\s+\d{4})",
+            r"FACULTY OF\s+([A-Za-z\s]+)",
+            r"FIELD OF STUDY\s+([A-Za-z\s]+)",
+            r"DEGREE CONFERRED\s+([A-Za-z.()\s]+)"
+        ]
         
-
+        text_str = " ".join(text)
         
+        for pattern in transcript_patterns:
+            if not re.search(pattern, text_str):
+                return False
+            
+        return True
+        
+    def check_validation(self, files):
+            user = User(student_code="6510450861")
+            # form = Form.objects.get(form_id=form_id)
+            
+            t, a, r = False, False, False
+            if files[0]:
+                transcript = self.extract_text_from_pdf(files[0])
+                st_info = self.get_student_info(transcript)
+                if (st_info["id"] == user.student_code) and (self.is_valid_transcript(transcript)) and (st_info["field"].lower() == "computer science"):
+                    t = True
+                if files[1]:
+                    activity = self.extract_text_from_pdf(files[1])
+                    a = self.is_valid_activity(activity, user.student_code)
+                if files[2]:
+                    receipt = self.extract_text_from_pdf(files[2])
+                    if self.extract_receipt_info(receipt)["id"] == user.student_code:
+                        r = True
+            
+            if t and a and r:
+                VerificationResult.objects.create(
+                    result_status=VerificationResult.VerificationResult.NOT_PASS,
+                    activity_status=VerificationResult.VerificationResult.NOT_PASS,
+                    # fee_status=VerificationResult.VerificationResult.NOT_PASS,
+                    # form_fk=form
+                )
+                return True
+            else:
+                return False
