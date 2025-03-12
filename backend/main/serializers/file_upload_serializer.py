@@ -5,3 +5,6 @@ class FileUploadSerializer(serializers.Serializer):
     activity = serializers.FileField(required=False)
     receipt = serializers.FileField(required=False)
     
+    # form_id = serializers.UUIDField(required=True)
+    # user_id = serializers.UUIDField(required=True) 
+    
