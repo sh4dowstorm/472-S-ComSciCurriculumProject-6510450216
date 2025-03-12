@@ -5,6 +5,7 @@ import Button from "../components/button";
 import UploadFileButton from "../components/uploadfile-button";
 import "../styles/creditCheck.css";
 import { IoWarningOutline } from "react-icons/io5";
+import axios from "axios";
 
 const CreditCheckPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -26,7 +27,7 @@ const CreditCheckPage: React.FC = () => {
     setFile(null);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!file) {
       setMessage("ไม่สามารถตรวจสอบไฟล์ได้");
       setMessageType("error");
@@ -36,10 +37,23 @@ const CreditCheckPage: React.FC = () => {
       setMessage("ไฟล์แนบต้องเป็น PDF");
       setMessageType("error");
     } else {
-      setMessage("ไฟล์ถูกต้อง");
-      setMessageType("success");
-      // Logic to send files to the backend
-      console.log("Files sent to backend:", file);
+      const formData = new FormData();
+      formData.append("transcript", file);
+
+      try {
+        const response = await axios.post("http://localhost:8000/api/upload/", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        setMessage("ไฟล์ถูกต้อง");
+        setMessageType("success");
+        console.log("Files sent to backend:", response.data);
+      } catch (error) {
+        setMessage("เกิดข้อผิดพลาดในการอัปโหลดไฟล์");
+        setMessageType("error");
+        console.error("Error uploading files:", error);
+      }
     }
   };
 

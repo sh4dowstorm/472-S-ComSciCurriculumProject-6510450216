@@ -5,37 +5,70 @@ import Button from "../components/button";
 import UploadFileButton from "../components/uploadfile-button";
 import "../styles/insertGradFile.css";
 import { IoWarningOutline } from "react-icons/io5";
+import axios from "axios";
 
 const InsertGradFile: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
+  const [transcriptFile, setTranscriptFile] = useState<File | null>(null);
+  const [activityFile, setActivityFile] = useState<File | null>(null);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [selectedPage, setSelectedPage] = useState("insertgradfile");
   const [message, setMessage] = useState<string | null>(null);
-  const [messageType, setMessageType] = useState<"error" | "success" | null>(null);
+  const [messageType, setMessageType] = useState<"error" | "success" | null>(
+    null
+  );
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [navigateTo, setNavigateTo] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setFile: React.Dispatch<React.SetStateAction<File | null>>
+  ) => {
     const selectedFile = event.target.files?.[0];
     setFile(selectedFile || null);
   };
 
-  const handleRemoveFile = () => {
+  const handleRemoveFile = (
+    setFile: React.Dispatch<React.SetStateAction<File | null>>
+  ) => {
     setFile(null);
   };
 
-  const handleSubmit = () => {
-    if (!file) {
-      setMessage("ไม่สามารถตรวจสอบไฟล์ได้");
+  const handleSubmit = async () => {
+    if (!transcriptFile || !activityFile || !receiptFile) {
+      setMessage("กรุณาแนบไฟล์ให้ครบทั้ง 3 ไฟล์");
       setMessageType("error");
-    } else if (file && file.type !== "application/pdf") {
+    } else if (
+      (transcriptFile && transcriptFile.type !== "application/pdf") ||
+      (activityFile && activityFile.type !== "application/pdf") ||
+      (receiptFile && receiptFile.type !== "application/pdf")
+    ) {
       setMessage("ไฟล์แนบต้องเป็น PDF");
       setMessageType("error");
     } else {
-      setMessage("ไฟล์ถูกต้อง");
-      setMessageType("success");
-      // Logic to send files to the backend
-      console.log("Files sent to backend:", file);
+      const formData = new FormData();
+      formData.append("transcript", transcriptFile);
+      formData.append("activity", activityFile);
+      formData.append("receipt", receiptFile);
+
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/upload/",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        setMessage("ไฟล์ถูกต้อง");
+        setMessageType("success");
+        console.log("Files sent to backend:", response.data);
+      } catch (error) {
+        setMessage("เกิดข้อผิดพลาดในการอัปโหลดไฟล์");
+        setMessageType("error");
+        console.error("Error uploading files:", error);
+      }
     }
   };
 
@@ -51,7 +84,7 @@ const InsertGradFile: React.FC = () => {
   }, [message]);
 
   const handleNavigate = (page: string) => {
-    if (file) {
+    if (transcriptFile || activityFile || receiptFile) {
       setShowConfirmPopup(true);
       setNavigateTo(page);
     } else {
@@ -103,43 +136,64 @@ const InsertGradFile: React.FC = () => {
           <div className="upload-section">
             <span className="upload-text"> แนบไฟล์ผลการเรียน*</span>
             <UploadFileButton
-              onChange={handleFileChange}
-              onRemoveFile={handleRemoveFile}
+              onChange={(e) => handleFileChange(e, setTranscriptFile)}
+              onRemoveFile={() => handleRemoveFile(setTranscriptFile)}
             />
           </div>
           <p />
           <div className="upload-section">
-            <span className="upload-text">
-              แนบไฟล์กิจกรรม*
-            </span>
+            <span className="upload-text">แนบไฟล์กิจกรรม*</span>
             <UploadFileButton
-              onChange={handleFileChange}
-              onRemoveFile={handleRemoveFile}
+              onChange={(e) => handleFileChange(e, setActivityFile)}
+              onRemoveFile={() => handleRemoveFile(setActivityFile)}
             />
           </div>
           <p />
           <div className="upload-section">
             <span className="upload-text">แนบหลักฐานการชำระค่าเทอม*</span>
             <UploadFileButton
-              onChange={handleFileChange}
-              onRemoveFile={handleRemoveFile}
+              onChange={(e) => handleFileChange(e, setReceiptFile)}
+              onRemoveFile={() => handleRemoveFile(setReceiptFile)}
             />
           </div>
           {message && (
             <div className="message-container">
-              <p className={messageType === "success" ? "success-message" : "error-message"}>{message}</p>
+              <p
+                className={
+                  messageType === "success"
+                    ? "success-message"
+                    : "error-message"
+                }
+              >
+                {message}
+              </p>
             </div>
           )}
           <p />
-          <Button text="ตรวจสอบไฟล์" className="button" onClick={handleSubmit} />
+          <Button
+            text="ตรวจสอบไฟล์"
+            className="button"
+            onClick={handleSubmit}
+          />
         </div>
       </div>
       {showConfirmPopup && (
         <div className="confirm-popup">
           <IoWarningOutline className="warning-icon" />
-          <p>หากเปลี่ยนเป็นฟอร์ม ไฟล์ที่แนบไว้จะหายไป คุณต้องการดำเนินการต่อหรือไม่?</p>
-          <Button text="ยืนยัน" className="confirm-button" onClick={confirmNavigation}/>
-          <Button text="ยกเลิก" className="cancel-button" onClick={cancelNavigation}/>
+          <p>
+            หากเปลี่ยนเป็นฟอร์ม ไฟล์ที่แนบไว้จะหายไป
+            คุณต้องการดำเนินการต่อหรือไม่?
+          </p>
+          <Button
+            text="ยืนยัน"
+            className="confirm-button"
+            onClick={confirmNavigation}
+          />
+          <Button
+            text="ยกเลิก"
+            className="cancel-button"
+            onClick={cancelNavigation}
+          />
         </div>
       )}
     </div>
