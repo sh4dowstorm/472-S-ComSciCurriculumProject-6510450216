@@ -121,7 +121,8 @@ class OCRService():
             _, year = summer_match.groups()
             return f"0/{int(year) - 1 + 543}"
         return None
-            
+    
+    #NOTE: Grading in Char , DONE   
     def extract_course_info(self, text, user):
         start_year = int(str(user.student_code)[:2])
         courses = {course.course_id: course for course in Course.objects.all() if self.get_valid_course(course, start_year)}
@@ -155,23 +156,21 @@ class OCRService():
                 while j < len(text):
                     next_item = text[j].strip()
                     if next_item in ['A', 'B', 'B+', 'C', 'C+', 'D', 'D+', 'F', 'P', 'NP', 'N']:
-                        grading = self.grade_mapping.get(next_item, -1) #NOTE: handle DecimalField
+                        # grading = self.grade_mapping.get(next_item, -1) #NOTE: handle DecimalField
+                        grading = next_item
                         break
                     j += 1  
 
                 if grading:
                     s, y = current_semester.split('/')
-                    try:
-                        print(Enrollment.objects.create(
-                            semester=s, 
-                            year=y, 
-                            grade=grading, 
-                            user_fk=user, 
-                            course_fk=course
-                        ))
-                        count += 1
-                    except ObjectDoesNotExist:
-                        print(f"course with course_id {course_id} not found.")
+                    print(Enrollment.objects.create(
+                        semester=s, 
+                        year=y, 
+                        grade=grading, 
+                        user_fk=user, 
+                        course_fk=course
+                    ))
+                    count += 1
             i += 1  
             
         print("Total courses:", count)
@@ -212,12 +211,25 @@ class OCRService():
     def is_valid_receipt_format(self, text):
         return bool(re.search(r"ใบเสร็จรับเงิน\.*", text[2]))
 
-    #NOTE: parameter user_id and form_id
     def check_validation(self, files):
-            user = User(student_code="6510450861")
-            # user = User.objects.get(student_code=user_id)
-            # form = Form.objects.get(form_id=form_id)
-            
+            """user = User.objects.create(
+                email = "moradop.h@ku.th",
+                password = "123456",
+                name = "Moradop",
+                student_code = "6510450861",
+                role = "student"
+            )
+            form = Form.objects.create(
+                form_type = Form.FormType.CREDIT_CHECK,
+                user_fk = user
+            )
+            Form.objects.create(
+                form_type = Form.FormType.GRADUATION_CHECK,
+                user_fk = user
+            )"""
+            user = User.objects.get(user_id="e6c70c9292b547f19c2446e12df63004") #mock
+            form = Form.objects.get(form_id="1feff2db39a5478f819e6031d9002d1a") #mock
+
             response = {
                 "transcript": {"valid": False, "message": ""},
                 "activity": {"valid": False, "message": ""},
@@ -232,6 +244,7 @@ class OCRService():
                     if st_info["id"] == user.student_code:
                         if st_info["field"].lower() == "computer science":
                             response["transcript"]["valid"] = True
+                            self.extract_course_info(transcript, user)
                         else:
                             response["transcript"]["message"] = "Invalid field in transcript (should be 'Computer Science')."
                     else:
@@ -244,6 +257,7 @@ class OCRService():
                 
                 if self.get_studentId_activity(activity, user.student_code) == user.student_code:
                     response["activity"]["valid"] = True
+                    upload_to_minio(files[1], f"{user.student_code}/activity.pdf")
                 else:
                     response["activity"]["message"] = "Invalid or mismatched activity data."
 
@@ -256,24 +270,31 @@ class OCRService():
                         response["receipt"]["message"] = "Receipt ID does not match student ID."
                 else:
                     response["receipt"]["message"] = "Invalid receipt format."
-
-
-            if all(file["valid"] for file in response.values()):
-                upload_to_minio(files[0], f"{user.student_code}/transcript.pdf")
-                upload_to_minio(files[1], f"{user.student_code}/activity.pdf")
-                upload_to_minio(files[2], f"{user.student_code}/receipt.pdf")
-                VerificationResult.objects.create(
-                    result_status=VerificationResult.VerificationResult.NOT_PASS,
-                    activity_status=VerificationResult.VerificationResult.NOT_PASS,
-                    # fee_status=VerificationResult.VerificationResult.NOT_PASS,
-                    # form_fk=form
-                )
-                return {"status": "success", "message": "All files are valid."}
-                
-                # file = download_from_minio(f"{user.student_code}/transcript.pdf")
-            else:
-                return {
-                    "status": "failure",
-                    "message": "Some files failed validation.",
-                    "errors": response
-                }
+            
+            if any(file["valid"] for file in response.values()):
+                check = 0
+                if form.form_type == Form.FormType.CREDIT_CHECK and response["transcript"]["valid"] and not response["activity"]["valid"] and not response["receipt"]["valid"]:
+                    upload_to_minio(files[0], f"{user.student_code}/transcript.pdf")
+                    check = 1
+                    
+                if form.form_type == Form.FormType.GRADUATION_CHECK and all(file["valid"] for file in response.values()):
+                    upload_to_minio(files[0], f"{user.student_code}/transcript.pdf")
+                    upload_to_minio(files[1], f"{user.student_code}/activity.pdf")
+                    upload_to_minio(files[2], f"{user.student_code}/receipt.pdf")
+                    check = 1
+                    
+                if check:
+                    VerificationResult.objects.create(
+                        form_fk=form
+                    )
+                    form.status = Form.FormStatus.READY_TO_CALC
+                    form.save()
+                    return {"status": "success", "message": "All files are valid."}
+                    # file = download_from_minio(f"{user.student_code}/transcript.pdf")
+            return {
+                "status": "failure",
+                "message": "Some files failed validation.",
+                "errors": response
+            }
+    
+    
