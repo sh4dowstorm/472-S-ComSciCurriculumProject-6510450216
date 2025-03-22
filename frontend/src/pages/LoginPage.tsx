@@ -60,7 +60,8 @@ function LoginPage() {
       });
 
       if (response.data.success) {
-        const userId = response.data.user.id; // Assuming the user ID is returned in the response
+        let userId = response.data.user.id; // Assuming the user ID is returned in the response
+        userId = userId.replace(/-/g, ""); // Remove "-" from the user_id
         localStorage.setItem("user", JSON.stringify(response.data.user)); // <--- ที่เพิ่มเข้ามา
         navigate("/insertGradFile", { state: { user_id: userId } }); // <--- ที่เพิ่มเข้ามา
       } else {
