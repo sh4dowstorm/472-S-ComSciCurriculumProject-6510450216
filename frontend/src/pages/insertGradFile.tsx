@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Button from "../components/button";
 import UploadFileButton from "../components/uploadfile-button";
-import "../styles/insertGradFile.css";
+import "../styles/InsertGradFile.css";
 import { IoWarningOutline } from "react-icons/io5";
 import axios from "axios";
 

@@ -56,5 +56,9 @@ def resetForm(uid: uuid.UUID) :
     form.save()
     
     # TODO: delete files
-    delete_from_minio(str(form.form_id))
+    try :
+        delete_from_minio(str(form.form_id))
+    except Exception as e :
+        print(e)
+        
     return 'Delete success'
