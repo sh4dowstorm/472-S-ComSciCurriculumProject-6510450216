@@ -8,7 +8,7 @@ from main.services.fill_curriculum_checking_service import FillCurriculumCheckin
 @require_http_methods(["GET"])
 def fillCurriculumCheckingView(request):
     service = FillCurriculumCheckingService()
-    FillCurriculumCheckingService.generate_and_upload(service, "8494c72a6a21456a8d0e446d93b51465")      # This is the user_id
+    # FillCurriculumCheckingService.generate_and_upload(service, "8494c72a6a21456a8d0e446d93b51465")      # This is the user_id
     return JsonResponse({"message": "Form filled successfully!"})
 
 
