@@ -6,6 +6,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+**/__pycache__/
 
 # C extensions
 *.so
@@ -184,5 +185,8 @@ pyrightconfig.json
 [Ss]cripts
 pyvenv.cfg
 pip-selfcheck.json
+
+### Testing Output File ###
+output.txt
 
 # End of https://www.toptal.com/developers/gitignore/api/python,virtualenv

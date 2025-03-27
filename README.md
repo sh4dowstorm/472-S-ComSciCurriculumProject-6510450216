@@ -8,6 +8,13 @@ This project is about checking the criteria of students to confirm graduation. T
 3. graduation applications
 4. activity sheets (optional).
 
+# How to activate frontend
+To activate frontend run the following command
+> suggest using git bash
+1. `cd frontend/`
+2. `npm install`
+3. `npm run dev`
+
 # How to activate backend
 
 To activate backend run the following command 
@@ -28,13 +35,17 @@ To activate backend run the following command
     - username : root
     - password : 1234
 
+> [!IMPORTANT]
+> Python version should be (or more than) 3.10.x
+
 ### setup environment
 1. `python -m venv .venv`
 2. __activate virtual environment__ -> `source .venv/Scripts/activate`
-3. `pip install -r requirement.txt`
-4. `cp .env.example backend/.env`
-5. `python backend/manage.py makemigrations`
-6. `python backend/manage.py migrate`
+3. `cd ./backend`
+4. `pip install -r requirement.txt`
+5. `cp ../.env.example .env`
+6. `python backend/manage.py makemigrations`
+7. `python backend/manage.py migrate`
 
 ### run server
 1. `python backend/manage.py runserver`
@@ -42,3 +53,14 @@ To activate backend run the following command
 ### deactivate backend program
 1. `docker compose down`
 2. `deactivate` in terminal using virtual environment
+
+### email for sending OTP code
+1. `EMAIL_HOST_USER = 'xxxxxxxxxx@gmail.com'` change the email
+2. `EMAIL_HOST_PASSWORD = 'xxxxxxxxxxxxxxxx'` change the app password (get the app password from google account)
+
+### how to do unit testing
+1. `cd backend`
+2. `pytest -sv`
+
+> `-s` flag is to show console printing </br>
+> `-v` flag is to show detail
