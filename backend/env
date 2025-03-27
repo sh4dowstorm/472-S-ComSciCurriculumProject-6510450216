@@ -1,0 +1,15 @@
+DB_NAME=cs_curriculum
+DB_USER=root
+DB_PASSWORD=1234
+DB_HOST=db
+DB_PORT=3306
+
+MINIO_ACCESS_KEY=eD65UexYb9YRpHE3r5rr
+MINIO_SECRET_KEY=yLsp3ajcEUesFp1R0Jrs9vx6lTrCjqV0dpzCyFlU
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin
+MINIO_BUCKET=comscicurriculum
+MINIO_ENDPOINT="minio:9000"
+
+EMAIL_HOST_USER=giftmeonetime@gmail.com
+EMAIL_HOST_PASSWORD=tcgwpqheiqzzhmyn
