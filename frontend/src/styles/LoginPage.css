@@ -47,7 +47,7 @@
   
   
   .ku-logo {
-    background-image: url('src/assets/KU_logo.png'); 
+    background-image: url('/assets/KU_logo.png'); 
     background-size: contain;
     background-repeat: no-repeat;
     width: 109px; 

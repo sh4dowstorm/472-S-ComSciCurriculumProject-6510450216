@@ -283,7 +283,7 @@ function GradeResultElement({
 }
 
 function VerifyResult({ status }: { status: boolean }) {
-  let icon: string = "src/assets/";
+  let icon: string = "/assets/";
   icon += status ? "check-mark.png" : "x-mark.png";
 
   const statusLabel = status ? "ผ่าน" : "ไม่ผ่าน";
@@ -313,7 +313,7 @@ function InspectorVerification({ status }: { status: string }) {
 
   return (
     <div className={`form-status ${style}`}>
-      <img src={`src/assets/${icon}`} />
+      <img src={`/assets/${icon}`} />
       <p>: {statusLabel}</p>
     </div>
   );
@@ -322,7 +322,7 @@ function InspectorVerification({ status }: { status: string }) {
 function NotPassCourse({ courses }: { courses: NotPassCourse[] }) {
   return (
     <div className="not-pass-course">
-      <img src="src/assets/warning-red.png" />
+      <img src="/assets/warning-red.png" />
       <p>วิชาที่ไม่ผ่านเกณฑ์</p>
       <div className="horizontal-space" />
       {courses.map((course) => (
