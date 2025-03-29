@@ -1,4 +1,4 @@
-# ComSciCurriculumProject
+bb# ComSciCurriculumProject
 
 ## This repository creates for senior project Integrated Agile Process and Devops_01418472-65.
 
@@ -64,3 +64,49 @@ To activate backend run the following command
 
 > `-s` flag is to show console printing </br>
 > `-v` flag is to show detail
+
+---
+
+# Agile & DevOps 01418472
+
+## ชื่อเว็บไซต์: ComSci Curriculum Project 
+## วัตถุประสงค์
+ต้องการจะยื่นเอกสารต่างๆในการขอจบการศึกษาทำให้เจ้าหน้าที่ภาคต้องใช้เวลามากในการตรวจสอบเอกสารของนิสิตทุกคนจึงเกิดมาเป็น Project นี้ที่จะทำให้ใช้เวลาในการตรวจสอบเอกสารต่างๆที่ใช้ในการยื่นจบการศึกษาได้รวดเร็วมากยิ่งขึ้น
+## ชื่อกลุ่ม: Sad-Boi
+### ชื่อสมาชิก
+
+| ชื่อ-นามสกุล | รหัสนิสิต | หมู่เรียน | ชั้นปี
+| --- | --- | --- | --- |
+| คณิศร ศรีสว่าง | 6510450216 | 200 | 3 | 
+| ไชยภัทร ศรีอำไพ | 6510450305 | 200 | 3 |
+| ปณิธาน จำปาหอม | 6510450569 | 200 | 3 |
+| มรฑป เฮงประเสริฐ | 6510450861 | 200 | 3 |
+
+<br></br>
+| ชื่อ-นามสกุล | Feature ที่รับผิดชอบ 
+| --- | --- |
+| คณิศร ศรีสว่าง | @sh4dowstorm Feat: [Upload File](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/upload-file-devops)
+| ไชยภัทร ศรีอำไพ | @MoreINV8 Feat: [Curriculum Calculate](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/calculate_credit-devops), [Curriculum Calculate Display](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/curriculum_progress-devops)
+| ปณิธาน จำปาหอม | ${\color{red}Product Owner}$
+| มรฑป เฮงประเสริฐ | @moradoph Feat: [OCR File](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/ocr-devops), [Extracted Text Processing](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/extracted-text-processing-devops)
+
+
+
+<br></br>
+---
+
+## ชื่อกลุ่ม: OIIAIIOIIIAI
+### ชื่อสมาชิก
+
+| ชื่อ-นามสกุล | รหัสนิสิต | หมู่เรียน | ชั้นปี
+| --- | --- | --- | --- |
+| กิตติธัช เข่งพิมล | 6510450208 | 200 | 3 | 
+| พิชญ์ชนก คงสมปรีดิ์ | 6510450739 | 200 | 3 |
+| ภาณุวิชญ์ สังข์ธูป | 6510450798 | 200 | 3 |
+
+<br></br>
+| ชื่อ-นามสกุล | Feature ที่รับผิดชอบ 
+| --- | --- |
+| กิตติธัช เข่งพิมล | ${\color{red}Product Owner}$
+| พิชญ์ชนก คงสมปรีดิ์ | @Pichanokk Feat: [ชื่อฟีเจอร์](url-link)
+| ภาณุวิชญ์ สังข์ธูป | @panuwit89 Feat: [ชื่อฟีเจอร์](url-link)
