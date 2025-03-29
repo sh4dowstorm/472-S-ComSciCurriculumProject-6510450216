@@ -49,7 +49,7 @@ def signup_view(request):
         if not email_sent:
             return JsonResponse({
                 'success': False, 
-                'message': error or 'Failed to send OTP email'
+                'message': 'Failed to send OTP'
             }, status=500)
         
         # Return success response with reference for OTP verification
@@ -68,5 +68,5 @@ def signup_view(request):
     except Exception as e:
         return JsonResponse({
             'success': False, 
-            'message': str(e)
+            'message': "Error occurred during signup process"
         }, status=500)
