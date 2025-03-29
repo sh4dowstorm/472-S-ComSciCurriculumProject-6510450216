@@ -1,4 +1,7 @@
 name: Backend Action
+permissions:
+    contents: read
+    pull-requests: write
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on:
     pull_request: 
