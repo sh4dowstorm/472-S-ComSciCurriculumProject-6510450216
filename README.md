@@ -108,5 +108,5 @@ To activate backend run the following command
 | ชื่อ-นามสกุล | Feature ที่รับผิดชอบ 
 | --- | --- |
 | กิตติธัช เข่งพิมล | @kktopkk  ${\color{red}(Product Owner)}$
-| พิชญ์ชนก คงสมปรีดิ์ | @Pichanokk Feat: [ชื่อฟีเจอร์](url-link)
-| ภาณุวิชญ์ สังข์ธูป | @panuwit89 Feat: [ชื่อฟีเจอร์](url-link)
+| พิชญ์ชนก คงสมปรีดิ์ | @Pichanokk Feat: User Account ([Signup Function](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/signup), [Login Function](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/login-devops), [Curriculum Checking PDF](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/curriculum-checking-pdf))
+| ภาณุวิชญ์ สังข์ธูป | @panuwit89 Feat: Course Management & File Access ([Create Curriculum and Category](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/create_curriculum_and_category), [Import Courses](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/import_courses), [Forms View](https://github.com/Bi-Ma-GOoOD/ComSciCurriculumProject/tree/feature/pending-forms))
