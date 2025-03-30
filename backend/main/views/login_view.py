@@ -49,7 +49,7 @@ def login_view(request):
             error_message = result
             return JsonResponse({
                 'success': False,
-                'message': error_message
+                'message': "Authentication Failed"
             }, status=401)
             
     except json.JSONDecodeError:
@@ -60,5 +60,5 @@ def login_view(request):
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'message': f'Server error: {str(e)}'
+            'message': "Error occurred during login process"
         }, status=500)
