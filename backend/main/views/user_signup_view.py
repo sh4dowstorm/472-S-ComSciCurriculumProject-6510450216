@@ -86,7 +86,7 @@ def user_signup_view(request):
         except Exception as e:
             return JsonResponse({
                 'success': False, 
-                'message': f'Failed to create user: {str(e)}'
+                'message': "Failed to create user"
             }, status=500)
     
     except json.JSONDecodeError:
@@ -98,5 +98,5 @@ def user_signup_view(request):
     except Exception as e:
         return JsonResponse({
             'success': False, 
-            'message': str(e)
+            'message': "Error occurred during registration"
         }, status=500)

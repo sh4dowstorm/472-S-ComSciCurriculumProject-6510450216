@@ -57,5 +57,5 @@ def otp_verify_view(request):
     except Exception as e:
         return JsonResponse({
             'success': False, 
-            'message': str(e)
+            'message': "Error occurred during OTP verification"
         }, status=500)

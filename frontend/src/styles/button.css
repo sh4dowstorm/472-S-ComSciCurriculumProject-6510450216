@@ -89,3 +89,24 @@
   background-color: #9e9e9e;
   color: white; 
 }
+
+.button.inspect-button {
+  align-self: flex-start; /* Align the button to the start (left) */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e1e1e1; /* Button background color */
+  color: black; /* Button text color */
+  font-size: 1em;
+  width: 150px; /* Fixed width */
+  height: 50px; /* Fixed height */
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  margin-bottom: 40px !important;
+}
+
+.button.inspect-button:hover {
+  background-color: #9e9e9e;
+  color: white;
+}
